@@ -1,0 +1,61 @@
+\documentclass[a4paper]{article}
+\usepackage[a4paper,margin=3cm]{geometry}
+
+\title{
+  Runtime Verification using Four Valued Timed Propositional Temporal Logic\\
+  \normalsize{} COMP4560 Report
+}
+\author{
+  Alexander Cox
+  \thanks{Studying a Bachelor of Science at The Australian National University (ANU)}\\
+  \small\texttt{u6060697@anu.edu.au}\\
+  \normalsize{}Supervised by Professor Peter Baumgartner\thanks{Data61, CSIRO\@; ANU}
+}
+\usepackage[backend=biber, style=numeric-comp]{biblatex}
+\addbibresource{report.bib}
+
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{thmtools, thm-restate}
+\declaretheorem[numberwithin=subsection,name=Theorem]{thm}
+\declaretheorem[sibling=thm,name=Lemma]{lem}
+\declaretheorem[sibling=thm,name=Corollary]{corl}
+\declaretheorem[sibling=thm,style=definition,name=Definition]{defn}
+\declaretheorem[sibling=thm,style=remark,name=Notation]{notn}
+\declaretheorem[sibling=thm,style=remark,name=Remark]{remk}
+\usepackage{alltt}
+\usepackage{hyperref}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+\section{Introduction}
+\subsection{Runtime Verification}
+Runtime verification~\autocite{colin2005rv} is a method of monitoring a system and checking whether it satisfies (or violates) a correctness property.
+The properties of runtime verification are temporal properties, and are often specified in a temporal logic. % TODO example
+
+Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, by means of a model of that system. In runtime verification we are concerned only with real world runs of a system, with the system not modeled, but monitored. In model checking the system has infinite runs, whereas in runtime verification, runs are finite.
+
+\section{Temporal Logic}
+In this project, our correctness properties are expressed using a temporal logic, i.e., a modal logic which can be used to reason about time. All of the logics I will discuss are based in Linear Temporal Logic.
+
+\subsection{Linear Temporal Logic}
+Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic created for model checking.
+
+\subsection{Timed Propositional Temporal Logic}
+\subsection{Finite LTL}
+\subsection{Finite TPTL}
+\section{Runtime Verification using Formula Rewriting}
+\section{Discussion}
+\section{Future Work}
+\section{Conclusion}
+\subsection{Acknowledgements}
+
+\nocite{*}
+\printbibliography{}
+\newpage
+\section{Appendix}\label{appendix}
+
+\end{document}
