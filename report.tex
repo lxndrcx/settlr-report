@@ -2,7 +2,7 @@
 \usepackage[a4paper,margin=3.5cm]{geometry}
 
 \title{
-  Runtime Verification using Four Valued Timed Propositional Temporal Logic\\
+  Four Valued Timed Propositional Temporal Logic for Runtime Verification\\
   \normalsize{} COMP4560 Report
 }
 \author{
@@ -41,6 +41,8 @@
 \begin{abstract}
 \end{abstract}
 \newpage
+\tableofcontents
+\newpage
 
 \section{Introduction}
 \subsection{Runtime Verification}
@@ -49,8 +51,12 @@ The properties of runtime verification are temporal properties, and are often sp
 
 Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, by means of a model of that system. In runtime verification we are concerned only with real world runs of a system, with the system not modeled, but monitored. In model checking the system has infinite runs, whereas in runtime verification, runs are finite.
 
+%TODO why is my project important
+
 \section{Temporal Logic}
 In this project, our correctness properties are expressed using a temporal logic, i.e., a modal logic which can be used to reason about time. All of the logics I will discuss are based on Linear Temporal Logic.
+
+%TODO more words
 
 \subsection{Linear Temporal Logic}
 Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic created for model checking. It's syntax and semantics follow. Assume that we have an infinite supply of propositional variables $a,b,c,\dots$.
@@ -81,25 +87,86 @@ The formulae of LTL are interpreted over sequences of states called traces.
 \end{defn}
 
 \begin{notn}
-Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$ and $\sigma^i$ is $\sigma$ with the first $i$ elements removed.
+Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\sigma^i$ is $\sigma$ with the first $i$ elements removed, and $\epsilon$ is the empty sequence.
 \end{notn}
 
 \begin{defn}{LTL Semantics}
 
-  Let $P$ be a set of propositional variables and $\sigma$ a trace. The satisfaction relation $\vDash$ is inductively defined as follows:
+  Let $P$ be a set of propositional variables and $\sigma$ a trace. The satisfaction relation $\vDash_{L}$ is inductively defined as follows:
 \begin{align*}
-  \sigma &\vDash a \iff a \in \sigma_0\\
-  \sigma &\nvDash \bot\\
-  \sigma &\vDash \neg \varphi \iff \sigma \nvDash \varphi\\
-  \sigma &\vDash \varphi \lor \psi \iff \sigma \vDash \varphi \tor \sigma \vDash \psi\\
-  \sigma &\vDash \varphi \land \psi \iff \sigma \vDash \varphi \tand \sigma \vDash \psi\\
-  \sigma &\vDash \bigcirc \varphi \iff \sigma^1 \vDash \varphi\\
-  \sigma &\vDash \varphi \U \psi \iff \sigma^i \vDash \psi \fsome i \geq 0 \tand \sigma^j \vDash \varphi \fall 0 \leq j < i
+  \sigma &\vDash_{L} a \iff a \in \sigma_0\\
+  \sigma &\nvDash_{L} \bot\\
+  \sigma &\vDash_{L} \neg \varphi \iff \sigma \nvDash_{L} \varphi\\
+  \sigma &\vDash_{L} \varphi \lor \psi \iff \sigma \vDash_{L} \varphi \tor \sigma \vDash_{L} \psi\\
+  \sigma &\vDash_{L} \varphi \land \psi \iff \sigma \vDash_{L} \varphi \tand \sigma \vDash_{L} \psi\\
+  \sigma &\vDash_{L} \bigcirc \varphi \iff \sigma^1 \vDash_{L} \varphi\\
+  \sigma &\vDash_{L} \varphi \U \psi \iff \sigma^i \vDash_{L} \psi \fsome i \geq 0 \tand \sigma^j \vDash_{L} \varphi \fall 0 \leq j < i
 \end{align*}
 
 \end{defn}
 
+\begin{lem}{Expansion laws}
+
+  In LTL, the following equivalences hold:
+  \begin{align}
+    \Box \varphi &\equiv \varphi \land \bigcirc \Box \varphi\\
+    \Diamond \varphi &\equiv \varphi \lor \bigcirc \Diamond \varphi\\
+    \psi \U \varphi &\equiv \varphi \lor \bigcirc \psi \U \varphi
+  \end{align}
+
+\end{lem}
+
+%TODO Examples
+
+
+
+\subsection{Finite LTL}
+For runtime verification, we are generally concerned with finite traces. Since LTL and TPTL are both defined over infinite traces, a modification of the semantics is necessary to apply them to runtime verification problems. %TODO give good reasons
+There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)\autocite{rosu2005rewriting}, RV-LTL\autocite{bauer2010comparing} and the two logics which RV-LTL is based upon, FLTL and LTL$_3$\autocite{bauer2010comparing}
+
+\paragraph{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state.
+\begin{defn}{IE-LTL semantics}
+\end{defn}
+
+\newcommand{\sn}{\bigcirc^+}
+\newcommand{\wn}{\bigcirc^-}
+
+\paragraph{FLTL} For FLTL, the next operator of LTL is split into a weak ($\wn$) and strong ($\sn$) version.
+The strong next requires the existence of a next state to be true, while the weak next operator is vacuously true if there is no next state.
+Thus, in the final state, the weak operator evaluates to true, and the strong next to false. The strong and weak next operators are dual of each other, with  $\neg\sn\varphi \equiv \wn\neg\varphi$.
+\begin{defn}{FLTL semantics}
+
+  Given the standard LTL semantics, replace the rule for the next operator with:
+  \begin{align*}
+    \sigma&\vDash_F\sn\varphi \iff \sigma^1\vDash_F\varphi \tand \sigma^1 \neq \epsilon\\
+    \sigma&\vDash_F\wn\varphi \iff \sigma^1\vDash_F\varphi \tor \sigma^1 = \epsilon
+  \end{align*}
+\end{defn}
+
+\begin{lem}
+
+  In FLTL, the expansion laws become: 
+  \begin{align}
+    \Box \varphi \equiv \varphi \land \wn \Box \varphi\\
+    \Diamond \varphi \equiv \varphi \lor \sn \Diamond \varphi\\
+    \psi \U \varphi \equiv \varphi \lor \sn \psi \U \varphi
+  \end{align}
+
+\end{lem}
+
+\paragraph{LTL$_3$}
+\begin{defn}{LTL$_3$ semantics}
+\end{defn}
+
+\paragraph{RV-LTL} RV-LTL is based on two other logics FLTL and LTL$_3$\autocite{bauer2010comparing}.  to split the next operator into weak and strong next operators.
+\begin{defn}{RV-LTL semantics}
+\end{defn}
+
+
 \subsection{Timed Propositional Temporal Logic}
+Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extension of LTL to encode explicit time into the logic. In LTL, only the order of states is reasoned about, i.e., $\sigma_i$ is before $\sigma_{i+1}$, but for many verification problems it can be useful to reason about the explicit time at which a state occurs, i.e., $\sigma_i$ is 3 time units earlier than $\sigma_{i+1}$. For this we define a time trace which contains the sequence of times corresponding to the sequence of states. A quantifier called a \emph{freeze operator} is added to the logic, which binds occurrences of a variable to the time at which the operator is evaluated. Integer comparison is added to the logic, to allow for specifications such as: ``If $p$ becomes true, $q$ will become true within 5 time units".
+
+
 \begin{defn}{Timed Trace}
 
   A Timed Trace $\rho = (\sigma,\tau)$ is a pair of a trace (state sequence) $\sigma \in P^+$ and a time sequence $\tau \in \mathbb{N}^+$ which is a sequence of non-negative integers that is monotonically non-decreasing ($\forall i. ~\tau_i \leq \tau_{i+1}$) and eventually always increasing ($\forall i. \exists j. ~\tau_i < \tau_j$).
@@ -122,19 +189,20 @@ Assume there exist an infinite supply of time variables  and let $V=\{x,y,z...\}
   TPTL has the same abbreviations as LTL, plus abbreviations for comparison operations between terms such as $\pi_1 < \pi_2 := \pi_1 \leq \pi_2 \land \neg(\pi_2 \leq \pi_1)$, and so on as expected for $>,\geq,=,\neq$.
 \end{notn}
 
-\begin{defn}{PTPL Semantics}
+\begin{defn}{TPTL Semantics}
   \newcommand{\eval}{\mathcal{E}}
-  Let $\rho = (\sigma,\tau)$ be a time trace, and let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
-  PTPL has the only slightly modified semantics for the fragment which overlaps with LTL. For those cases, just substitute occurrences of $\sigma\vDash$ with $\rho\vDash$. The remainder of the definition is as follows.
+
+  Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
+  TPTL has the only slightly modified semantics for the fragment which overlaps with LTL. For those cases, just substitute occurrences of $\sigma\vDash_{LTL}\cdots$ with $\rho\vDash_{T,\eval}\cdots$. The remainder of the definition is as follows:
   \begin{align*}
-    \rho\vDash
+    \rho&\vDash_{T,\eval}\pi_1\leq\pi_2 \iff \eval(\pi_1)\leq\eval(\pi_2)\\
+    \rho&\vDash_{T,\eval} x.\varphi \iff \rho\vDash_{T,\eval[x:=\tau_0]}\varphi
   \end{align*}
 \end{defn}
 
-
-\subsection{Finite LTL}
+%TODO examples of specifications
 \subsection{Finite TPTL}
-\subsection{RV-TPTL}
+\paragraph{RV-TPTL}
 \section{Runtime Verification using Formula Rewriting}
 \section{Implementation in Scala}
 %shallow embedding / internal DSL ref TraceContract
