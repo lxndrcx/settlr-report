@@ -14,7 +14,7 @@
 
 \usepackage{parskip}
 
-\usepackage[backend=biber, style=numeric-comp]{biblatex}
+\usepackage[backend=biber, style=alphabetic]{biblatex}
 \addbibresource{report.bib}
 
 \usepackage{mathtools}
@@ -119,13 +119,19 @@ Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\si
 %TODO Examples
 
 
-
 \subsection{Finite LTL}
 For runtime verification, we are generally concerned with finite traces. Since LTL and TPTL are both defined over infinite traces, a modification of the semantics is necessary to apply them to runtime verification problems. %TODO give good reasons
-There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)\autocite{rosu2005rewriting}, RV-LTL\autocite{bauer2010comparing} and the two logics which RV-LTL is based upon, FLTL and LTL$_3$\autocite{bauer2010comparing}
+There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)\autocite{rosu2005rewriting}, RV-LTL\autocite{bauer2010comparing} and the two logics which RV-LTL is based upon, FLTL and LTL$_3$\autocite{bauer2010comparing}.
+Assume that each trace $\sigma$ in this section is finite.
 
 \paragraph{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state.
 \begin{defn}{IE-LTL semantics}
+
+  Let $\sigma_f$ be the final state of the trace. Given the usual LTL semantics, add the following:
+  \begin{align*}
+    \sigma_f &\vDash_{IE} \bigcirc \varphi \iff \sigma_f \vDash_{IE} \varphi\\
+    \sigma_f &\vDash_{IE} \varphi \U \psi \iff \sigma_f \vDash_{IE} \psi
+  \end{align*}
 \end{defn}
 
 \newcommand{\sn}{\bigcirc^+}
@@ -145,21 +151,47 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
 \begin{lem}
 
-  In FLTL, the expansion laws become: 
+  In FLTL, the expansion laws become:
   \begin{align}
-    \Box \varphi \equiv \varphi \land \wn \Box \varphi\\
+    \Box \varphi \equiv \varphi \land \wn \Box \varphi \label{fltl-el1}\\
     \Diamond \varphi \equiv \varphi \lor \sn \Diamond \varphi\\
     \psi \U \varphi \equiv \varphi \lor \sn \psi \U \varphi
   \end{align}
 
 \end{lem}
 
-\paragraph{LTL$_3$}
-\begin{defn}{LTL$_3$ semantics}
+\begin{proof}
+  From \autocite{bauer2010comparing}.
+  %Bauer 5.3
+\end{proof}
+
+\newcommand{\ltlt}{LTL$_3$}
+\paragraph{\ltlt} In \ltlt, a new truth value is introduced to represent uncertainty.
+\begin{defn}{\ltlt\ semantics}
+
+  The semantics for \ltlt\ are defined by cases relying on standard LTL semantics. The notation $\sigma\gamma$ refers to the concatenation of the infinite trace $\gamma$ to the finite trace $\sigma$.
+  \[\sigma\vDash_3\varphi =
+    \begin{cases}
+      \top & \text{if } \sigma\gamma \vDash_L \fall \gamma \in P^+\\
+      \bot & \text{if } \sigma\gamma \vDash_L \fall \gamma \in P^+\\
+      ? & \text{otherwise}
+    \end{cases}
+    \]
 \end{defn}
 
-\paragraph{RV-LTL} RV-LTL is based on two other logics FLTL and LTL$_3$\autocite{bauer2010comparing}.  to split the next operator into weak and strong next operators.
+\paragraph{RV-LTL} RV-LTL is based on FLTL and \ltlt.
 \begin{defn}{RV-LTL semantics}
+
+  The semantics for RV-LTL are also defined by cases.
+  \[\sigma\vDash_{RV}\varphi =
+    \begin{cases}
+      \top & \text{if } \sigma \vDash_3 \varphi = \top\\
+      \bot & \text{if } \sigma \vDash_3 \varphi = \bot\\
+      \top^P & \text{if } \sigma \vDash_3 \varphi = ~?\tand \sigma\vDash_F = \top \\
+      \bot^P & \text{if } \sigma \vDash_3 \varphi = ~?\tand \sigma\vDash_F = \bot \\
+
+    \end{cases}
+  \]
 \end{defn}
 
 
@@ -193,7 +225,7 @@ Assume there exist an infinite supply of time variables  and let $V=\{x,y,z...\}
   \newcommand{\eval}{\mathcal{E}}
 
   Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
-  TPTL has the only slightly modified semantics for the fragment which overlaps with LTL. For those cases, just substitute occurrences of $\sigma\vDash_{LTL}\cdots$ with $\rho\vDash_{T,\eval}\cdots$. The remainder of the definition is as follows:
+  TPTL uses the same semantics as LTL for those operators which overlap with LTL, except the relation is defined over a time trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{LTL}\cdots$ with $\rho\vDash_{T,\eval}\cdots$. The remainder of the definition is as follows:
   \begin{align*}
     \rho&\vDash_{T,\eval}\pi_1\leq\pi_2 \iff \eval(\pi_1)\leq\eval(\pi_2)\\
     \rho&\vDash_{T,\eval} x.\varphi \iff \rho\vDash_{T,\eval[x:=\tau_0]}\varphi
