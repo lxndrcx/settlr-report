@@ -18,17 +18,28 @@
 \addbibresource{report.bib}
 
 \usepackage{mathtools}
-\usepackage{amsthm, amssymb}
+\usepackage{amssymb}
+\usepackage{amsthm}
 % \numberwithin{equation}{subsection}
 \usepackage{thmtools, thm-restate}
-\usepackage[nothm]{thmbox}
-\declaretheorem[numberwithin=subsection,thmbox=L,name=Theorem]{thm}
-\declaretheorem[sibling=thm,thmbox=M,name=Lemma]{lem}
-\declaretheorem[sibling=thm,thmbox=M,name=Corollary]{corl}
-\declaretheorem[sibling=thm,thmbox=M,style=definition,name=Definition]{defn}
-\declaretheorem[sibling=thm,thmbox=M,style=remark,name=Notation]{notn}
-\declaretheorem[sibling=thm,thmbox=M,style=remark,name=Remark]{remk}
-% \declaretheorem[sibling=thm,thmbox=M,style=remark,name=Example]{eg}
+% \usepackage[nothm]{thmbox}
+\declaretheorem[numberwithin=subsection,name=Theorem]{thm}
+\declaretheorem[sibling=thm,name=Lemma]{lem}
+\declaretheorem[sibling=thm,name=Corollary]{corl}
+\declaretheorem[sibling=thm,style=definition,name=Definition]{defn}
+\declaretheorem[sibling=thm,style=remark,name=Notation]{notn}
+\declaretheorem[sibling=thm,style=remark,name=Remark]{remk}
+\declaretheorem[sibling=thm,style=remark,name=Example]{eg}
+\usepackage{mdframed}
+\mdfsetup{linewidth=1pt,rightline=false,bottomline=false,skipabove=\topskip}
+\surroundwithmdframed{thm}
+\surroundwithmdframed{lem}
+\surroundwithmdframed{corl}
+\surroundwithmdframed{defn}
+\surroundwithmdframed{eg}
+\surroundwithmdframed{remk}
+\surroundwithmdframed{notn}
+
 \setcounter{secnumdepth}{2}
 \usepackage{alltt}
 \usepackage{hyperref}
@@ -288,7 +299,7 @@ Each state is consumed in the process, and all relevant information from the pas
 Let $\rw{S,E}$ denote a formula rewriting step under the logical system $S$ with the state $E$. E.g. $\varphi\rw{RL,E}\psi$ says that the formula $\varphi$ rewrites to $\psi$ under RV-LTL using the state $E$.
 \end{notn}
 
-\begin{example}{Traffic Lights}
+\begin{eg}{Traffic Lights}
 
 For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $V=\{r,y,g\}$, $\sigma = ({g},{r})$ and $\varphi = \Box (g \to (\neg r \U y))$. This trace should violate the formula. Here is the progression:
 \begin{align}
@@ -298,7 +309,7 @@ For a simple example, consider the LTL traffic light example from \textcite[175]
 
 The rewrite in \eqref{rw1} uses the expansion law $\Box \varphi \equiv \varphi \land \bigcirc \Box \varphi$ and then rewrites that given that $g$ is true.
 Then in \eqref{rw2} the formula is rewritten to false, since the right conjunct is false given $r$ being true.
-\end{example}
+\end{eg}
 
 \section{Implementation in Scala}
 %shallow embedding / internal DSL ref TraceContract
