@@ -21,12 +21,14 @@
 \usepackage{amsthm, amssymb}
 % \numberwithin{equation}{subsection}
 \usepackage{thmtools, thm-restate}
-\declaretheorem[numberwithin=subsection,name=Theorem]{thm}
-\declaretheorem[sibling=thm,name=Lemma]{lem}
-\declaretheorem[sibling=thm,name=Corollary]{corl}
-\declaretheorem[sibling=thm,style=definition,name=Definition]{defn}
-\declaretheorem[sibling=thm,style=remark,name=Notation]{notn}
-\declaretheorem[sibling=thm,style=remark,name=Remark]{remk}
+\usepackage[nothm]{thmbox}
+\declaretheorem[numberwithin=subsection,thmbox=L,name=Theorem]{thm}
+\declaretheorem[sibling=thm,thmbox=M,name=Lemma]{lem}
+\declaretheorem[sibling=thm,thmbox=M,name=Corollary]{corl}
+\declaretheorem[sibling=thm,thmbox=M,style=definition,name=Definition]{defn}
+\declaretheorem[sibling=thm,thmbox=M,style=remark,name=Notation]{notn}
+\declaretheorem[sibling=thm,thmbox=M,style=remark,name=Remark]{remk}
+% \declaretheorem[sibling=thm,thmbox=M,style=remark,name=Example]{eg}
 \setcounter{secnumdepth}{2}
 \usepackage{alltt}
 \usepackage{hyperref}
@@ -40,6 +42,7 @@
 \newcommand{\wn}{\bigcirc^-}
 \newcommand{\eval}{\mathcal{E}}
 \newcommand{\ltlt}{LTL$_3$}
+\newcommand{\rw}[1]{\Rightarrow_{#1}}
 \begin{document}
 \maketitle
 
@@ -47,7 +50,7 @@
 \end{abstract}
 \newpage
 \tableofcontents
-\newpage
+% \newpage
 
 \section{Introduction}
 \subsection{Runtime Verification}
@@ -56,12 +59,12 @@ The properties of runtime verification are temporal properties, and are often sp
 
 Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, by means of a model of that system. In runtime verification we are concerned only with real world runs of a system, with the system not modeled, but monitored. In model checking the system has infinite runs, whereas in runtime verification, runs are finite.
 
-%TODO why is my project important
+% TODO why is my project important
 
 \section{Temporal Logic}
 In this project, our correctness properties are expressed using a temporal logic, i.e., a modal logic which can be used to reason about time. All of the logics I will discuss are based on Linear Temporal Logic.
 
-%TODO more words
+% TODO more words
 
 \subsection{Linear Temporal Logic}
 Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic created for model checking. It's syntax and semantics follow. Assume that we have an infinite supply of propositional variables $a,b,c,\dots$.
@@ -95,6 +98,8 @@ The formulae of LTL are interpreted over sequences of states called traces.
 Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\sigma^i$ is $\sigma$ with the first $i$ elements removed, and $\epsilon$ is the empty sequence.
 \end{notn}
 
+Let $L$ be shorthand for LTL.
+
 \begin{defn}{LTL Semantics}
 
   Let $P$ be a set of propositional variables and $\sigma$ a trace. The satisfaction relation $\vDash_{L}$ is inductively defined as follows:
@@ -121,7 +126,7 @@ Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\si
 
 \end{lem}
 
-%TODO Examples
+% TODO Examples
 
 
 \subsection{Finite LTL}
@@ -129,7 +134,7 @@ For runtime verification, we are generally concerned with finite traces. Since L
 There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)\autocite{rosu2005rewriting}, RV-LTL\autocite{bauer2010comparing} and the two logics which RV-LTL is based upon, FLTL and LTL$_3$\autocite{bauer2010comparing}.
 Assume that each trace $\sigma$ in this section is finite.
 
-\subsubsection{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state.
+\subsubsection{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state. Let $IE$ be shorthand for IE-LTL.
 \begin{defn}{IE-LTL semantics}
 
   Let $\sigma_f$ be the final state of the trace. Given the usual LTL semantics, add the following:
@@ -142,13 +147,13 @@ Assume that each trace $\sigma$ in this section is finite.
 
 \subsubsection{FLTL} For FLTL, the next operator of LTL is split into a weak ($\wn$) and strong ($\sn$) version.
 The strong next requires the existence of a next state to be true, while the weak next operator is vacuously true if there is no next state.
-Thus, in the final state, the weak operator evaluates to true, and the strong next to false. The strong and weak next operators are dual of each other, with  $\neg\sn\varphi \equiv \wn\neg\varphi$.
+Thus, in the final state, the weak operator evaluates to true, and the strong next to false. The strong and weak next operators are dual of each other, with  $\neg\sn\varphi \equiv \wn\neg\varphi$. Let $FL$ be shorthand for FLTL.
 \begin{defn}{FLTL semantics}
 
   Given the standard LTL semantics, replace the rule for the next operator with:
   \begin{align*}
-    \sigma&\vDash_F\sn\varphi \iff \sigma^1\vDash_F\varphi \tand \sigma^1 \neq \epsilon\\
-    \sigma&\vDash_F\wn\varphi \iff \sigma^1\vDash_F\varphi \tor \sigma^1 = \epsilon
+    \sigma&\vDash_{FL}\sn\varphi \iff \sigma^1\vDash_{FL}\varphi \tand \sigma^1 \neq \epsilon\\
+    \sigma&\vDash_{FL}\wn\varphi \iff \sigma^1\vDash_{FL}\varphi \tor \sigma^1 = \epsilon
   \end{align*}
 \end{defn}
 
@@ -168,11 +173,11 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
   %Bauer 5.3
 \end{proof}
 
-\subsubsection{\ltlt} In \ltlt, a new truth value is introduced to represent uncertainty.
+\subsubsection{\ltlt} In \ltlt, a new truth value is introduced to represent uncertainty. Let $L3$ be shorthand for \ltlt.
 \begin{defn}{\ltlt\ semantics}
 
   The semantics for \ltlt\ are defined by cases relying on standard LTL semantics. The notation $\sigma\gamma$ refers to the concatenation of the infinite trace $\gamma$ to the finite trace $\sigma$.
-  \[\sigma\vDash_3\varphi =
+  \[\sigma\vDash_{L3}\varphi =
     \begin{cases}
       \top & \text{if } \sigma\gamma \vDash_L \varphi \fall \gamma \in P^+\\
       \bot & \text{if } \sigma\gamma \vDash_L \varphi \fall \gamma \in P^+\\
@@ -181,16 +186,16 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
     \]
 \end{defn}
 
-\subsubsection{RV-LTL} RV-LTL is based on FLTL and \ltlt.
+\subsubsection{RV-LTL} RV-LTL is based on FLTL and \ltlt. Let $RL$ be shorthand for RV-LTL
 \begin{defn}{RV-LTL semantics}
 
   The semantics for RV-LTL are also defined by cases.
-  \[\sigma\vDash_{RV}\varphi =
+  \[\sigma\vDash_{RL}\varphi =
     \begin{cases}
-      \top & \text{if } \sigma \vDash_3 \varphi = \top\\
-      \bot & \text{if } \sigma \vDash_3 \varphi = \bot\\
-      \top^P & \text{if } \sigma \vDash_3 \varphi = ~?\tand \sigma\vDash_F = \top \\
-      \bot^P & \text{if } \sigma \vDash_3 \varphi = ~?\tand \sigma\vDash_F = \bot \\
+      \top & \text{if } \sigma \vDash_{L3} \varphi = \top\\
+      \bot & \text{if } \sigma \vDash_{L3} \varphi = \bot\\
+      \top^P & \text{if } \sigma \vDash_{L3} \varphi = ~?\tand \sigma\vDash_{FL} = \top \\
+      \bot^P & \text{if } \sigma \vDash_{L3} \varphi = ~?\tand \sigma\vDash_{FL} = \bot \\
 
     \end{cases}
   \]
@@ -225,6 +230,8 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
   TPTL has the same abbreviations as LTL, plus abbreviations for comparison operations between terms such as $\pi_1 < \pi_2 := \pi_1 \leq \pi_2 \land \neg(\pi_2 \leq \pi_1)$, and so on as expected for $>,\geq,=,\neq$.
 \end{notn}
 
+Let $T$ be shorthand for TPTL.
+
 \begin{defn}{TPTL Semantics}
 
   Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
@@ -235,13 +242,13 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
   \end{align*}
 \end{defn}
 
-%TODO examples of specifications
+% TODO examples of specifications
 \subsection{Finite TPTL}
-\subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
+\subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time. Let $RT$ be shorthand for RV-TPTL.
 \begin{defn}{RV-TPTL Semantics}
 
   I will give the semantics based on TPTL, in cases as RV-LTL was given. Let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times as in TPTL.
-  The notation $\rho\omega$ refers to the concatenation of the infinite time trace $\omega$ to the finite time trace $\rho$. 
+  The notation $\rho\omega$ refers to the concatenation of the infinite time trace $\omega$ to the finite time trace $\rho$.
 
   Let $\vDash_{T3}$ be given by:
   \[\rho\vDash_{T3}\varphi = \begin{cases}
@@ -271,6 +278,28 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 % TODO maybe include a IE-TPTL?
 
 \section{Runtime Verification using Formula Rewriting}
+\subsection{Formula Rewriting}
+Formula rewriting~\autocite{rosu2005rewriting}, or formula progression, is a technique used in runtime verification.
+The idea is to rewrite the formula in question using the expansion laws, and simplifying using the truth values in the current state.
+Each state is consumed in the process, and all relevant information from the past is brought forward in the rewritten formula.
+
+\begin{notn}{Rewrites}
+
+Let $\rw{S,E}$ denote a formula rewriting step under the logical system $S$ with the state $E$. E.g. $\varphi\rw{RL,E}\psi$ says that the formula $\varphi$ rewrites to $\psi$ under RV-LTL using the state $E$.
+\end{notn}
+
+\begin{example}{Traffic Lights}
+
+For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $V=\{r,y,g\}$, $\sigma = ({g},{r})$ and $\varphi = \Box (g \to (\neg r \U y))$. This trace should violate the formula. Here is the progression:
+\begin{align}
+  \Box (g \to (\neg r \U y)) &\rw{RL,\{g\}} \Box (g \to (\neg r \U y)) \land (\neg r \U y)\label{rw1}\\
+  &\rw{RL,\{r\}} \bot\label{rw2}
+\end{align}
+
+The rewrite in \eqref{rw1} uses the expansion law $\Box \varphi \equiv \varphi \land \bigcirc \Box \varphi$ and then rewrites that given that $g$ is true.
+Then in \eqref{rw2} the formula is rewritten to false, since the right conjunct is false given $r$ being true.
+\end{example}
+
 \section{Implementation in Scala}
 %shallow embedding / internal DSL ref TraceContract
 
