@@ -131,9 +131,9 @@ Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\si
 
   In LTL, the following equivalences hold:
   \begin{align}
-    \Box \varphi &\equiv \varphi \land \bigcirc \Box \varphi\\
-    \Diamond \varphi &\equiv \varphi \lor \bigcirc \Diamond \varphi\\
-    \psi \U \varphi &\equiv \varphi \lor \bigcirc \psi \U \varphi
+    \Box \varphi &\equiv \varphi \land \bigcirc \Box \varphi\label{elbox}\\
+    \Diamond \varphi &\equiv \varphi \lor \bigcirc \Diamond \varphi\label{eldiamond}\\
+    \psi \U \varphi &\equiv \varphi \lor \bigcirc \psi \U \varphi\label{elU}
   \end{align}
 
 \end{lem}
@@ -174,9 +174,9 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
   In FLTL, the following expansion laws are equivalences:
   \begin{align}
-    \Box \varphi \equiv \varphi \land \wn \Box \varphi \label{fltl-el1}\\
-    \Diamond \varphi \equiv \varphi \lor \sn \Diamond \varphi\\
-    \psi \U \varphi \equiv \varphi \lor \sn \psi \U \varphi
+    \Box \varphi \equiv \varphi \land \wn \Box \varphi \label{felBox}\\
+    \Diamond \varphi \equiv \varphi \lor \sn \Diamond \varphi\label{felDiamond}\\
+    \psi \U \varphi \equiv \varphi \lor \sn \psi \U \varphi\label{felU}
   \end{align}
 
 \end{lem}
@@ -230,7 +230,7 @@ Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extensi
 
 Assume there exist an infinite supply of time variables  and let $V=\{x,y,z...\}$ be the set of these variables.
 
-\begin{defn}{TPTL Syntax}
+\begin{defn}{TPTL Syntax}\label{tptlsyn}
   Let $a\in P$ be a propositional variable, $x\in V$ be a time variable and $c\in\mathbb{N}$ a constant.
 
   TPTL terms $\pi$ and formulas $\varphi$ are inductively defined as follows:
@@ -242,7 +242,7 @@ Assume there exist an infinite supply of time variables  and let $V=\{x,y,z...\}
 
 We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 
-\begin{notn}{Abbreviations}
+\begin{notn}{Abbreviations}\label{tptlabbrev}
 
   TPTL has the same abbreviations as LTL, plus abbreviations for comparison operations between terms such as $\pi_1 < \pi_2 := \pi_1 \leq \pi_2 \land \neg(\pi_2 \leq \pi_1)$, and so on as expected for $>,\geq,=,\neq$.
 \end{notn}
@@ -261,6 +261,16 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 \subsection{Finite TPTL}
 \subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
 
+\begin{defn}{RV-TPTL Syntax}
+
+  Copy the term syntax from \Cref{tptlsyn} and define the formulas of RV-TPTL as:
+  \[\varphi ::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
+  \]
+\end{defn}
+\begin{notn}{RV-TPTL abbreviations}
+
+  Take the standard abbreviations for TPTL (\Cref{tptlabbrev}) and add the abbreviation \(\top^P := \neg \bot^P\).
+\end{notn}
 \begin{defn}{RV-TPTL Semantics}
 
   I will give the semantics based on TPTL, in cases as RV-LTL was given. Let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times as in TPTL.
@@ -296,45 +306,73 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 \section{Runtime Verification using Formula Rewriting}
 \subsection{Formula Rewriting}
 Formula rewriting~\autocite{rosu2005rewriting}, or formula progression, is a technique used in runtime verification.
-The idea is to rewrite the formula in question using the expansion laws, and simplifying using the truth values in the current state.
+The idea is to simplify the formula using the truth values at the current state, then rewrite the formula using the expansion laws, and finally remove the top level $\bigcirc,\sn,\wn$ operators (except in the final state). The resulting formula is true at the next state iff the original formula was true at the original state in the trace.
 Each state is consumed in the process, and all relevant information from the past is brought forward in the rewritten formula.
 
 \begin{notn}{Rewrites}
 
-Let $\rw{S,E}$ denote a formula rewriting step under the logical system $S$ with the state $E$. E.g. $\varphi\rw{RVLTL,E}\psi$ says that the formula $\varphi$ rewrites to $\psi$ under RV-LTL using the state $E$.
+  Let $\rw{\text{S},E}$ denote a formula rewriting step under the logical system S with the state $E$. E.g. $\varphi\rw{\text{RV-LTL},E}\psi$ says that the formula $\varphi$ rewrites to $\psi$ under RV-LTL using the state $E$.
 \end{notn}
 
 \begin{eg}{Traffic Lights}
 
-For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $V=\{r,y,g\}$, $\sigma = ({g},{r})$ and $\varphi = \Box (g \to (\neg r \U y))$. The trace $\sigma$ should violate the formula. Here is the progression:
+  For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $V=\{r,y,g\}$, $\sigma = (\{g\},\{r\})$ and $\varphi = \Box (g \to (\neg r \U y))$. The trace $\sigma$ should violate the formula. Let $\rw{E}$ stand for $\rw{\text{IE-LTL},E}$ in this example. Here is the progression:
 \begin{align}
-  \Box (g \to (\neg r \U y)) &\rw{RVLTL,\{g\}} \Box (g \to (\neg r \U y)) \land (\neg r \U y)\label{rw1}\\
-  &\rw{RVLTL,\{r\}} \bot\label{rw2}
+  \Box (g \to (\neg r \U y)) &\rw{\{g\}} \Box (g \to (\neg r \U y)) \land (\neg r \U y)\label{rw1}\\
+  &\rw{\{r\}} \bot\label{rw2}
 \end{align}
 
-The rewrite in \eqref{rw1} uses the expansion law $\Box \varphi \equiv \varphi \land \bigcirc \Box \varphi$ and then rewrites that given that $g$ is true.
-Then in \eqref{rw2} the formula is rewritten to false, since the right conjunct is false given $r$ being true.
+The rewrite in~\eqref{rw1} uses the expansion law $\Box \varphi \equiv \varphi \land \bigcirc \Box \varphi$ and then rewrites that given that $g$ is true.
+Then in~\eqref{rw2} the formula is rewritten to false, since the right conjunct is false given $r$ being true. This is the case whether or not $\{r\}$ is the final state in the trace. If the trace were longer no more of it would need to be validated, all possible suffixes of $\sigma$ violate the formula $\varphi$.
 \end{eg}
+
+Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ for the remainder of the section.
 
 \begin{eg}{Apples}
 
-  For a timed example in RV-TPTL, consider a container of apples which needs to be delivered to a store within a specified time. Let $V=\{sent, received\}$, \[\rho=((\{\},\{sent\},\{received\}\{\}),(1,3,4,6)),\] \[\varphi=\Box x. (sent \to \Diamond y. (received \land y \leq x + 3)).\]
-  The trace $\rho$ should satisfy the formula.
+  For a timed example in RV-TPTL, consider a container of apples which needs to be delivered to a store within a specified time. Let $V=\{sent, received\}$, \(\rho=((\{sent\},\{received\}),(1,4)),\) and \(\varphi=\Box x. (sent \to \Diamond y. (received \land y \leq x + 3)).\)
+  The trace $\rho$ will presumably satisfy the formula.
   Here is the progression:
   \begin{align}
-    &&\Box x. (sent \to \Diamond y. (received \land y \leq x + 3))\nonumber\\
-    &\rw{RVTPTL,\{\}}
-    &\Box x. (sent \to \Diamond y. (received \land y \leq x + 3))
-    \label{rw3}\\
-    &\rw{RVTPTL,\{sent\}}
-    &\Box x. (sent \to \Diamond y. (received \land y \leq x + 3)) \land \Diamond y. (received \land y \leq 6)
-    \label{rw4}\\
+    &\Box x. (sent \to \Diamond y. (received \land y \leq x + 3))\nonumber\\
+    \rw{\{sent\}}
+    &\Box x. (sent \to \Diamond y. (received \land y \leq x + 3))\nonumber\\
+    &\land \Diamond y. (received \land y \leq 4)
+    \label{eg-apples1}\\
+    \rw{\{received\}}
+    &(\wn \Box x. (sent \to \Diamond y. (received \land y \leq x + 3))\nonumber\\
+    &\land \sn \Diamond y. (received \land y \leq 4))\nonumber\\
+    &\lor \wn \Box x. (sent \to \Diamond y. (received \land y \leq x + 3))\label{eg-apples2}\\
+    \vDash
+    &\top^P\label{eg-apples3}
   \end{align}
+  The formula $\varphi$ is rewritten to~\eqref{eg-apples1} using simplification given $\{sent\}$ and the expansion law $\Box \varphi \equiv \varphi \land \wn \Box \varphi$~\eqref{felBox}.
+  Then the formula is rewritten to~\eqref{eg-apples2} using the expansions laws~\eqref{felBox} and~\eqref{felDiamond} given $\{received\}$.
+  Note that the next operators are not stripped in this last state of the trace.
+  Since the end of the trace is reached, we have $(\top^P \land \bot^P) \lor \top^P$ by the semantics of RV-TPTL, which is equivalent to $\top^P$ in~\eqref{eg-apples3}.
+
+  Thus the formula $\varphi$ presumably satisfies the trace $\rho$.
+  Adding a finite suffix could change that result, namely if you have a trace where $sent$ is never followed by $received$.
+  In this case you would get the result $\bot^P$ instead.
+
+  Note that this formula is only ever satisfied or violated by infinite traces, which is why the uncertainty given by RV-TPTL is plausibly desirable given a finite trace.
 \end{eg}
 
+\begin{remk}{Complexity of Formula Rewriting}
+\end{remk}
+
+\subsection{Related Work}
+Formula rewriting was devised for LTL in \textcite{rosu2005rewriting}, as part of the Java PathExplorer project, and has been used in some NASA programs. The technique was revised for TPTL in \textcite{chai2013rewriting}, with a case study of its potential for use in a train control system. In both of these works, a separate rewrite engine called Maude~\autocite{clavel2002maude} was used. In the next section I discuss the implementation of my rewrite based verification tool, which does not use Maude.
 
 \section{Implementation in Scala}
-%shallow embedding / internal DSL ref TraceContract
+% shallow embedding / internal DSL ref TraceContract
+\subsection{Shallow Embedding}
+\subsection{Formula Rewriting}
+\subsection{Runtime Verification}
+
+% TODO time abbreviations (free vars)
+
+% TODO complexity better with simp
 
 \section{Discussion}
 \subsection{Future Work}
