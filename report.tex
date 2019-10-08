@@ -22,6 +22,7 @@
 \usepackage{amsthm}
 % \numberwithin{equation}{subsection}
 \usepackage{thmtools, thm-restate}
+\usepackage{nameref, hyperref, cleveref}
 % \usepackage[nothm]{thmbox}
 \declaretheorem[numberwithin=subsection,name=Theorem]{thm}
 \declaretheorem[sibling=thm,name=Lemma]{lem}
@@ -47,6 +48,7 @@
 \newcommand{\U}{\mathsf{U}}
 \newcommand{\tand}{\text{ and }}
 \newcommand{\tor}{\text{ or }}
+\newcommand{\tiff}{\text{ iff }}
 \newcommand{\fsome}{\text{ for some }}
 \newcommand{\fall}{\text{ for all }}
 \newcommand{\sn}{\bigcirc^+}
@@ -68,7 +70,7 @@
 Runtime verification~\autocite{colin2005rv} is a method of monitoring a system and checking whether it satisfies (or violates) a correctness property.
 The properties of runtime verification are temporal properties, and are often specified in a temporal logic. % TODO example
 
-Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, by means of a model of that system. In runtime verification we are concerned only with real world runs of a system, with the system not modeled, but monitored. In model checking the system has infinite runs, whereas in runtime verification, runs are finite.
+Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, by means of a model of that system. In runtime verification we are concerned only with real world runs of a system, with the system not modeled, but monitored. In model checking each run of the system is infinite, whereas in runtime verification, runs are always a finite prefix of an infinite run, even if the system runs forever.
 
 % TODO why is my project important
 
@@ -82,7 +84,7 @@ Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic cre
 \begin{defn}{LTL Syntax}
 
   An LTL formula $\varphi$ is inductively defined in as follows\footnote{In Bachus-Naur form}:
-  \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U\varphi\]
+  \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U\varphi\]
 \end{defn}
 \begin{notn}{LTL Abbreviations}
 
@@ -90,6 +92,7 @@ Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic cre
   \begin{align*}
     \top &:= \neg \bot\\
     \varphi \to \psi &:= \neg \varphi \lor \psi\\
+    \varphi \land \psi &:= \neg (\neg \varphi \lor \neg \psi)\\
     \varphi \leftrightarrow \psi &:= (\varphi \to \psi) \land (\psi \to \varphi)\\
     \Diamond \varphi &:= \top \U{} \varphi\\
     \Box \varphi &:= \neg\Diamond\neg\varphi
@@ -109,24 +112,22 @@ The formulae of LTL are interpreted over sequences of states called traces.
 Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\sigma^i$ is $\sigma$ with the first $i$ elements removed, and $\epsilon$ is the empty sequence.
 \end{notn}
 
-Let $L$ be shorthand for LTL.
+\begin{defn}{LTL Semantics}\label{ltlsem}
 
-\begin{defn}{LTL Semantics}
-
-  Let $P$ be a set of propositional variables and $\sigma$ a trace. The satisfaction relation $\vDash_{L}$ is inductively defined as follows:
+  Let $P$ be a set of propositional variables and $\sigma$ a trace. The satisfaction relation $\vDash_{LTL}$ is inductively defined as follows:
 \begin{align*}
-  \sigma &\vDash_{L} a \iff a \in \sigma_0\\
-  \sigma &\nvDash_{L} \bot\\
-  \sigma &\vDash_{L} \neg \varphi \iff \sigma \nvDash_{L} \varphi\\
-  \sigma &\vDash_{L} \varphi \lor \psi \iff \sigma \vDash_{L} \varphi \tor \sigma \vDash_{L} \psi\\
-  \sigma &\vDash_{L} \varphi \land \psi \iff \sigma \vDash_{L} \varphi \tand \sigma \vDash_{L} \psi\\
-  \sigma &\vDash_{L} \bigcirc \varphi \iff \sigma^1 \vDash_{L} \varphi\\
-  \sigma &\vDash_{L} \varphi \U \psi \iff \sigma^i \vDash_{L} \psi \fsome i \geq 0 \tand \sigma^j \vDash_{L} \varphi \fall 0 \leq j < i
+  \sigma &\vDash_{LTL} a \tiff a \in \sigma_0\\
+  \sigma &\nvDash_{LTL} \bot\\
+  \sigma &\vDash_{LTL} \neg \varphi \tiff \sigma \nvDash_{LTL} \varphi\\
+  \sigma &\vDash_{LTL} \varphi \lor \psi \tiff \sigma \vDash_{LTL} \varphi \tor \sigma \vDash_{LTL} \psi\\
+  \sigma &\vDash_{LTL} \varphi \land \psi \tiff \sigma \vDash_{LTL} \varphi \tand \sigma \vDash_{LTL} \psi\\
+  \sigma &\vDash_{LTL} \bigcirc \varphi \tiff \sigma^1 \vDash_{LTL} \varphi\\
+  \sigma &\vDash_{LTL} \varphi \U \psi \tiff \sigma^i \vDash_{LTL} \psi \fsome i \geq 0 \tand \sigma^j \vDash_{LTL} \varphi \fall 0 \leq j < i
 \end{align*}
 
 \end{defn}
 
-\begin{lem}{Expansion laws}
+\begin{lem}{Expansion laws}\label{ltlexp}
 
   In LTL, the following equivalences hold:
   \begin{align}
@@ -141,36 +142,37 @@ Let $L$ be shorthand for LTL.
 
 
 \subsection{Finite LTL}
-For runtime verification, we are generally concerned with finite traces. Since LTL and TPTL are both defined over infinite traces, a modification of the semantics is necessary to apply them to runtime verification problems. %TODO give good reasons
-There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)\autocite{rosu2005rewriting}, RV-LTL\autocite{bauer2010comparing} and the two logics which RV-LTL is based upon, FLTL and LTL$_3$\autocite{bauer2010comparing}.
+For runtime verification, we are generally concerned with finite traces. Since LTL is defined over infinite traces, a modification of the semantics is necessary to apply it to runtime verification problems. %TODO give good reasons
+There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)~\autocite{rosu2005rewriting}, RV-LTL~\autocite{bauer2010comparing} and the two logics which RV-LTL is based upon, FLTL and LTL$_3$~\autocite{bauer2010comparing}.
 Assume that each trace $\sigma$ in this section is finite.
 
-\subsubsection{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state. Let $IE$ be shorthand for IE-LTL.
+\subsubsection{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state.
 \begin{defn}{IE-LTL semantics}
 
-  Let $\sigma_f$ be the final state of the trace. Given the usual LTL semantics, add the following:
+  Let $\sigma_f$ be the final state of the trace. Copy the semantics from the LTL semantics \Cref{ltlsem}, and add the following to them:
   \begin{align*}
-    \sigma_f &\vDash_{IE} \bigcirc \varphi \iff \sigma_f \vDash_{IE} \varphi\\
-    \sigma_f &\vDash_{IE} \varphi \U \psi \iff \sigma_f \vDash_{IE} \psi
+    \sigma_f &\vDash_{IELTL} \bigcirc \varphi \tiff \sigma_f \vDash_{IELTL} \varphi\\
+    \sigma_f &\vDash_{IELTL} \varphi \U \psi \tiff \sigma_f \vDash_{IELTL} \psi
   \end{align*}
 \end{defn}
 
 
 \subsubsection{FLTL} For FLTL, the next operator of LTL is split into a weak ($\wn$) and strong ($\sn$) version.
 The strong next requires the existence of a next state to be true, while the weak next operator is vacuously true if there is no next state.
-Thus, in the final state, the weak operator evaluates to true, and the strong next to false. The strong and weak next operators are dual of each other, with  $\neg\sn\varphi \equiv \wn\neg\varphi$. Let $FL$ be shorthand for FLTL.
+Thus, in the final state, the weak operator evaluates to true, and the strong next to false. The strong and weak next operators are dual of each other, with  $\neg\sn\varphi \equiv \wn\neg\varphi$.
+
 \begin{defn}{FLTL semantics}
 
-  Given the standard LTL semantics, replace the rule for the next operator with:
+  Copy the standard LTL semantics in \Cref{ltlsem}, and replace the rule for the next operator with:
   \begin{align*}
-    \sigma&\vDash_{FL}\sn\varphi \iff \sigma^1\vDash_{FL}\varphi \tand \sigma^1 \neq \epsilon\\
-    \sigma&\vDash_{FL}\wn\varphi \iff \sigma^1\vDash_{FL}\varphi \tor \sigma^1 = \epsilon
+    \sigma&\vDash_{FLTL}\sn\varphi \tiff \sigma^1\vDash_{FLTL}\varphi \tand \sigma^1 \neq \epsilon\\
+    \sigma&\vDash_{FLTL}\wn\varphi \tiff \sigma^1\vDash_{FLTL}\varphi \tor \sigma^1 = \epsilon
   \end{align*}
 \end{defn}
 
-\begin{lem}
+\begin{lem}{Expansion Laws for FLTL}\label{fltlexp}
 
-  In FLTL, the expansion laws become:
+  In FLTL, the following expansion laws are equivalences:
   \begin{align}
     \Box \varphi \equiv \varphi \land \wn \Box \varphi \label{fltl-el1}\\
     \Diamond \varphi \equiv \varphi \lor \sn \Diamond \varphi\\
@@ -184,29 +186,31 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
   %Bauer 5.3
 \end{proof}
 
-\subsubsection{\ltlt} In \ltlt, a new truth value is introduced to represent uncertainty. Let $L3$ be shorthand for \ltlt.
+\subsubsection{\ltlt} In \ltlt, a new truth value is introduced to represent uncertainty.
+
 \begin{defn}{\ltlt\ semantics}
 
   The semantics for \ltlt\ are defined by cases relying on standard LTL semantics. The notation $\sigma\gamma$ refers to the concatenation of the infinite trace $\gamma$ to the finite trace $\sigma$.
-  \[\sigma\vDash_{L3}\varphi =
+  \[\sigma\vDash_{LTL_3}\varphi =
     \begin{cases}
-      \top & \text{if } \sigma\gamma \vDash_L \varphi \fall \gamma \in P^+\\
-      \bot & \text{if } \sigma\gamma \vDash_L \varphi \fall \gamma \in P^+\\
+      \top & \text{if } \sigma\gamma \vDash{LTL} \varphi \fall \gamma \in P^+\\
+      \bot & \text{if } \sigma\gamma \vDash{LTL} \varphi \fall \gamma \in P^+\\
       ? & \text{otherwise}
     \end{cases}
     \]
 \end{defn}
 
-\subsubsection{RV-LTL} RV-LTL is based on FLTL and \ltlt. Let $RL$ be shorthand for RV-LTL
+\subsubsection{RV-LTL} RV-LTL is based on FLTL and \ltlt.
+
 \begin{defn}{RV-LTL semantics}
 
   The semantics for RV-LTL are also defined by cases.
-  \[\sigma\vDash_{RL}\varphi =
+  \[\sigma\vDash_{RVLTL}\varphi =
     \begin{cases}
-      \top & \text{if } \sigma \vDash_{L3} \varphi = \top\\
-      \bot & \text{if } \sigma \vDash_{L3} \varphi = \bot\\
-      \top^P & \text{if } \sigma \vDash_{L3} \varphi = ~?\tand \sigma\vDash_{FL} = \top \\
-      \bot^P & \text{if } \sigma \vDash_{L3} \varphi = ~?\tand \sigma\vDash_{FL} = \bot \\
+      \top & \text{if } \sigma \vDash_{LTL_3} \varphi = \top\\
+      \bot & \text{if } \sigma \vDash_{LTL_3} \varphi = \bot\\
+      \top^P & \text{if } \sigma \vDash_{LTL_3} \varphi = ~?\tand \sigma\vDash_{FLTL} = \top \\
+      \bot^P & \text{if } \sigma \vDash_{LTL_3} \varphi = ~?\tand \sigma\vDash_{FLTL} = \bot \\
 
     \end{cases}
   \]
@@ -215,6 +219,8 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
 \subsection{Timed Propositional Temporal Logic}
 Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extension of LTL to encode explicit time into the logic. In LTL, only the order of states is reasoned about, i.e., $\sigma_i$ is before $\sigma_{i+1}$, but for many verification problems it can be useful to reason about the explicit time at which a state occurs, i.e., $\sigma_i$ is 3 time units earlier than $\sigma_{i+1}$. For this we define a time trace which contains the sequence of times corresponding to the sequence of states. A quantifier called a \emph{freeze operator} is added to the logic, which binds occurrences of a variable to the time at which the operator is evaluated. Integer comparison is added to the logic, to allow for specifications such as: ``If $p$ becomes true, $q$ will become true within 5 time units".
+
+% TODO say how TPTL generalises LTL, thanks Peter
 
 
 \begin{defn}{Timed Trace}
@@ -230,7 +236,7 @@ Assume there exist an infinite supply of time variables  and let $V=\{x,y,z...\}
   TPTL terms $\pi$ and formulas $\varphi$ are inductively defined as follows:
   \begin{align*}
     \pi &::= x + c ~|~ c\\
-    \varphi &::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
+    \varphi &::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
   \end{align*}
 \end{defn}
 
@@ -241,21 +247,20 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
   TPTL has the same abbreviations as LTL, plus abbreviations for comparison operations between terms such as $\pi_1 < \pi_2 := \pi_1 \leq \pi_2 \land \neg(\pi_2 \leq \pi_1)$, and so on as expected for $>,\geq,=,\neq$.
 \end{notn}
 
-Let $T$ be shorthand for TPTL.
-
 \begin{defn}{TPTL Semantics}
 
   Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
-  TPTL uses the same semantics as LTL for those operators which overlap with LTL, except the relation is defined over a time trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{LTL}\cdots$ with $\rho\vDash_{T,\eval}\cdots$. The remainder of the definition is as follows:
+  TPTL uses the same semantics as LTL for those operators which overlap with LTL, except the relation is defined over a time trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{LTL}\cdots$ with $\rho\vDash_{TPTL,\eval}\cdots$. The remainder of the definition is as follows:
   \begin{align*}
-    \rho&\vDash_{T,\eval}\pi_1\leq\pi_2 \iff \eval(\pi_1)\leq\eval(\pi_2)\\
-    \rho&\vDash_{T,\eval} x.\varphi \iff \rho\vDash_{T,\eval[x:=\tau_0]}\varphi
+    \rho&\vDash_{TPTL,\eval}\pi_1\leq\pi_2 \tiff \eval(\pi_1)\leq\eval(\pi_2)\\
+    \rho&\vDash_{TPTL,\eval} x.\varphi \tiff \rho\vDash_{TPTL,\eval[x:=\tau_0]}\varphi
   \end{align*}
 \end{defn}
 
 % TODO examples of specifications
 \subsection{Finite TPTL}
-\subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time. Let $RT$ be shorthand for RV-TPTL.
+\subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
+
 \begin{defn}{RV-TPTL Semantics}
 
   I will give the semantics based on TPTL, in cases as RV-LTL was given. Let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times as in TPTL.
@@ -263,20 +268,20 @@ Let $T$ be shorthand for TPTL.
 
   Let $\vDash_{T3}$ be given by:
   \[\rho\vDash_{T3}\varphi = \begin{cases}
-      \top & \text{if } \rho\omega \vDash_{T,\eval} \varphi \fall \omega \in (P^+,\mathbb{N}^+)\\
-      \bot & \text{if }  \rho\omega \vDash_{T,\eval} \varphi \fall \omega \in (P^+,\mathbb{N}^+)\\
+      \top & \text{if } \rho\omega \vDash_{TPTL,\eval} \varphi \fall \omega \in (P^+,\mathbb{N}^+)\\
+      \bot & \text{if }  \rho\omega \vDash_{TPTL,\eval} \varphi \fall \omega \in (P^+,\mathbb{N}^+)\\
       ? & \text{otherwise}
     \end{cases}
   \]
 
   Let $\vDash_{FT}$ be defined by taking TPTL semantics and adding:
   \begin{align*}
-    \rho&\vDash_{FT}\sn\varphi \iff \rho^1\vDash_{FT}\varphi \tand \rho^1 \neq \epsilon\\
-    \rho&\vDash_{FT}\wn\varphi \iff \rho^1\vDash_{FT}\varphi \tor \rho^1 = \epsilon
+    \rho&\vDash_{FT}\sn\varphi \tiff \rho^1\vDash_{FT}\varphi \tand \rho^1 \neq \epsilon\\
+    \rho&\vDash_{FT}\wn\varphi \tiff \rho^1\vDash_{FT}\varphi \tor \rho^1 = \epsilon
   \end{align*}
 
-  Finally, define $\vDash_{RT}$, the satisfaction relation for RV-TPTL, by the following:
-  \[\rho\vDash_{RT}\varphi =
+  Finally, define $\vDash_{RV-TPTL}$, the satisfaction relation for RV-TPTL, by the following:
+  \[\rho\vDash_{RV-TPTL}\varphi =
     \begin{cases}
       \top & \text{if } \sigma \vDash_{T3} \varphi = \top\\
       \bot & \text{if } \sigma \vDash_{T3} \varphi = \bot\\
@@ -296,15 +301,15 @@ Each state is consumed in the process, and all relevant information from the pas
 
 \begin{notn}{Rewrites}
 
-Let $\rw{S,E}$ denote a formula rewriting step under the logical system $S$ with the state $E$. E.g. $\varphi\rw{RL,E}\psi$ says that the formula $\varphi$ rewrites to $\psi$ under RV-LTL using the state $E$.
+Let $\rw{S,E}$ denote a formula rewriting step under the logical system $S$ with the state $E$. E.g. $\varphi\rw{RVLTL,E}\psi$ says that the formula $\varphi$ rewrites to $\psi$ under RV-LTL using the state $E$.
 \end{notn}
 
 \begin{eg}{Traffic Lights}
 
-For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $V=\{r,y,g\}$, $\sigma = ({g},{r})$ and $\varphi = \Box (g \to (\neg r \U y))$. This trace should violate the formula. Here is the progression:
+For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $V=\{r,y,g\}$, $\sigma = ({g},{r})$ and $\varphi = \Box (g \to (\neg r \U y))$. The trace $\sigma$ should violate the formula. Here is the progression:
 \begin{align}
-  \Box (g \to (\neg r \U y)) &\rw{RL,\{g\}} \Box (g \to (\neg r \U y)) \land (\neg r \U y)\label{rw1}\\
-  &\rw{RL,\{r\}} \bot\label{rw2}
+  \Box (g \to (\neg r \U y)) &\rw{RVLTL,\{g\}} \Box (g \to (\neg r \U y)) \land (\neg r \U y)\label{rw1}\\
+  &\rw{RVLTL,\{r\}} \bot\label{rw2}
 \end{align}
 
 The rewrite in \eqref{rw1} uses the expansion law $\Box \varphi \equiv \varphi \land \bigcirc \Box \varphi$ and then rewrites that given that $g$ is true.
@@ -313,15 +318,15 @@ Then in \eqref{rw2} the formula is rewritten to false, since the right conjunct 
 
 \begin{eg}{Apples}
 
-  For a timed example in TPTL, consider a container of apples which needs to be delivered to a store within a specified time. Let $V=\{sent, received\}$, \[\rho=((\{\},\{sent\},\{received\}\{\}),(1,3,4,6)),\] \[\varphi=\Box x. (sent \to \Diamond y. (received \land y \leq x + 3)).\]
-  This trace should satisfy the formula.
+  For a timed example in RV-TPTL, consider a container of apples which needs to be delivered to a store within a specified time. Let $V=\{sent, received\}$, \[\rho=((\{\},\{sent\},\{received\}\{\}),(1,3,4,6)),\] \[\varphi=\Box x. (sent \to \Diamond y. (received \land y \leq x + 3)).\]
+  The trace $\rho$ should satisfy the formula.
   Here is the progression:
   \begin{align}
     &&\Box x. (sent \to \Diamond y. (received \land y \leq x + 3))\nonumber\\
-    &\rw{RT,\{\}}
+    &\rw{RVTPTL,\{\}}
     &\Box x. (sent \to \Diamond y. (received \land y \leq x + 3))
     \label{rw3}\\
-    &\rw{RT,\{sent\}}
+    &\rw{RVTPTL,\{sent\}}
     &\Box x. (sent \to \Diamond y. (received \land y \leq x + 3)) \land \Diamond y. (received \land y \leq 6)
     \label{rw4}\\
   \end{align}
