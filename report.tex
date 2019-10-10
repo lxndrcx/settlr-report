@@ -86,7 +86,7 @@ Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic cre
   An LTL formula $\varphi$ is inductively defined in as follows\footnote{In Bachus-Naur form}:
   \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U\varphi\]
 \end{defn}
-\begin{notn}{LTL Abbreviations}
+\begin{notn}{LTL Abbreviations}\label{ltlabbrev}
 
   The following standard abbreviations are made:
   \begin{align*}
@@ -161,6 +161,19 @@ Assume that each trace $\sigma$ in this section is finite.
 The strong next requires the existence of a next state to be true, while the weak next operator is vacuously true if there is no next state.
 Thus, in the final state, the weak operator evaluates to true, and the strong next to false. The strong and weak next operators are dual of each other, with  $\neg\sn\varphi \equiv \wn\neg\varphi$.
 
+\begin{defn}{FLTL Syntax}
+
+  A FLTL formula $\varphi$ is inductively defined in as follows:
+  \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \sn \varphi ~|~ \varphi \U\varphi\]
+
+  $\sn$ is pronounced `strong next'.
+\end{defn}
+
+\begin{notn}{FLTL abbreviations}\label{fltlabbrev}
+
+  Take the standard abbreviations for LTL (\Cref{ltlabbrev}) and add the abbreviation $\wn \varphi:= \neg \sn \neg \varphi$. $\wn$ is pronounced `weak next'.
+\end{notn}
+
 \begin{defn}{FLTL semantics}
 
   Copy the standard LTL semantics in \Cref{ltlsem}, and replace the rule for the next operator with:
@@ -188,6 +201,13 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
 \subsubsection{\ltlt} In \ltlt, a new truth value is introduced to represent uncertainty.
 
+\begin{defn}{\ltlt\ Syntax}
+
+  A \ltlt\ formula $\varphi$ is inductively defined in as follows:
+  \[\varphi ::= a ~|~ \bot ~|~ ? ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \U\varphi\]
+
+  $?$ is pronounced `unknown'.
+\end{defn}
 \begin{defn}{\ltlt\ semantics}
 
   The semantics for \ltlt\ are defined by cases relying on standard LTL semantics. The notation $\sigma\gamma$ refers to the concatenation of the infinite trace $\gamma$ to the finite trace $\sigma$.
@@ -201,6 +221,18 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 \end{defn}
 
 \subsubsection{RV-LTL} RV-LTL is based on FLTL and \ltlt.
+\begin{defn}{RV-LTL Syntax}
+
+  An RV-LTL formula $\varphi$ is inductively defined in as follows:
+  \[\varphi ::= a ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \sn \varphi ~|~ \varphi \U\varphi\]
+
+  $\bot^P$ is pronounced `presumably false'.
+\end{defn}
+
+\begin{notn}{RV-LTL abbreviations}
+
+  Take the standard abbreviations for FLTL (\Cref{fltlabbrev}) and add the abbreviation $\top^P \varphi:= \neg \bot^P$. The constant $\top^P$ is pronounced `presumably true'.
+\end{notn}
 
 \begin{defn}{RV-LTL semantics}
 
@@ -210,12 +242,11 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
       \top & \text{if } \sigma \vDash_{LTL_3} \varphi = \top\\
       \bot & \text{if } \sigma \vDash_{LTL_3} \varphi = \bot\\
       \top^P & \text{if } \sigma \vDash_{LTL_3} \varphi = ~?\tand \sigma\vDash_{FLTL} = \top \\
-      \bot^P & \text{if } \sigma \vDash_{LTL_3} \varphi = ~?\tand \sigma\vDash_{FLTL} = \bot \\
-
+      \bot^P & \text{if } \sigma \vDash_{LTL_3} \varphi = ~?\tand \sigma\vDash_{FLTL} = \bot
     \end{cases}
   \]
 \end{defn}
-
+% TODO define how to decide or with top^p etc
 
 \subsection{Timed Propositional Temporal Logic}
 Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extension of LTL to encode explicit time into the logic. In LTL, only the order of states is reasoned about, i.e., $\sigma_i$ is before $\sigma_{i+1}$, but for many verification problems it can be useful to reason about the explicit time at which a state occurs, i.e., $\sigma_i$ is 3 time units earlier than $\sigma_{i+1}$. For this we define a time trace which contains the sequence of times corresponding to the sequence of states. A quantifier called a \emph{freeze operator} is added to the logic, which binds occurrences of a variable to the time at which the operator is evaluated. Integer comparison is added to the logic, to allow for specifications such as: ``If $p$ becomes true, $q$ will become true within 5 time units".
@@ -259,17 +290,19 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 
 % TODO examples of specifications
 \subsection{Finite TPTL}
+
+% TODO IE-TPTL
 \subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
 
 \begin{defn}{RV-TPTL Syntax}
 
   Copy the term syntax from \Cref{tptlsyn} and define the formulas of RV-TPTL as:
-  \[\varphi ::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
+  \[\varphi ::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \sn \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
   \]
 \end{defn}
 \begin{notn}{RV-TPTL abbreviations}
 
-  Take the standard abbreviations for TPTL (\Cref{tptlabbrev}) and add the abbreviation \(\top^P := \neg \bot^P\).
+  Take the standard abbreviations for TPTL (\Cref{tptlabbrev}) and add the abbreviations \(\top^P := \neg \bot^P\) and $\wn \varphi:= \neg \sn \neg \varphi$.
 \end{notn}
 \begin{defn}{RV-TPTL Semantics}
 
@@ -300,8 +333,6 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
     \end{cases}
   \]
 \end{defn}
-
-% TODO maybe include a IE-TPTL?
 
 \section{Runtime Verification using Formula Rewriting}
 \subsection{Formula Rewriting}
@@ -359,14 +390,17 @@ Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ for the remainder of the section.
 \end{eg}
 
 \begin{remk}{Complexity of Formula Rewriting}
+  % TODO
 \end{remk}
 
 \subsection{Related Work}
 Formula rewriting was devised for LTL in \textcite{rosu2005rewriting}, as part of the Java PathExplorer project, and has been used in some NASA programs. The technique was revised for TPTL in \textcite{chai2013rewriting}, with a case study of its potential for use in a train control system. In both of these works, a separate rewrite engine called Maude~\autocite{clavel2002maude} was used. In the next section I discuss the implementation of my rewrite based verification tool, which does not use Maude.
 
 \section{Implementation in Scala}
+I have implemented a runtime verifier in the Scala programming language. It is embedded into Scala as an internal Domain Specific Language (DSL), this is also known as a shallow embedding. I allow the user to choose a logic, either RV-TPTL or IE-TPTL.
 % shallow embedding / internal DSL ref TraceContract
 \subsection{Shallow Embedding}
+My implementation
 \subsection{Formula Rewriting}
 \subsection{Runtime Verification}
 
