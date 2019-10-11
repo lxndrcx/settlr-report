@@ -362,14 +362,16 @@ In my implementation of RV-TPTL, I have made a modification of the semantics. In
     \rho&\vDash\sn\varphi =
     \begin{cases}
       \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
-      \bot^P &\text{if } \rho^1 = \epsilon\\
+      \top &\text{if } \varphi \text{ is a tautology}\\
+      \bot^P &\text{if } \rho^1 = \epsilon \tand \varphi \text{ is not a tautology}\\
       \bot &\text{otherwise}
     \end{cases}\\
     \rho&\vDash\wn\varphi =
     \begin{cases}
       % \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tor \rho^1 = \epsilon\\
       \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
-      \top^P &\text{if } \rho^1 = \epsilon\\
+      \top &\text{if } \varphi \text{ is a tautology}\\
+      \top^P &\text{if } \rho^1 = \epsilon \tand \varphi \text{ is not a tautology}\\
       \bot &\text{otherwise}
     \end{cases}
   \end{align*}
