@@ -105,7 +105,7 @@ The formulae of LTL are interpreted over sequences of states called traces.
 
 \begin{defn}{Traces and states}
 
-  Let $P$ be a set of propositional variables. A \emph{state} $\rho_i \subseteq P$ is a set of propositional variables which are interpreted as true. A \emph{trace} $\sigma \in P^+$ is an infinite sequence of states.
+  Let $P$ be a set of propositional variables. A \emph{state} $\sigma_i \subseteq P$ is a set of propositional variables which are interpreted as true. A \emph{trace} $\sigma \in P^+$ is an infinite sequence of states.
 \end{defn}
 
 \begin{notn}
@@ -142,14 +142,14 @@ Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\si
 
 
 \subsection{Finite LTL}
-For runtime verification, we are generally concerned with finite traces. Since LTL is defined over infinite traces, a modification of the semantics is necessary to apply it to runtime verification problems. %TODO give good reasons
+For runtime verification, we are generally concerned with finite traces. Since LTL is defined over infinite traces, a modification of the logic is necessary to apply it to runtime verification problems. %TODO give good reasons
 There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)~\autocite{rosu2005rewriting}, RV-LTL~\autocite{bauer2010comparing} and the two logics which RV-LTL is based upon, FLTL and LTL$_3$~\autocite{bauer2010comparing}.
 Assume that each trace $\sigma$ in this section is finite.
 
-\subsubsection{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state.
+\subsubsection{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state. The syntax remains the same as in LTL.
 \begin{defn}{IE-LTL semantics}
 
-  Let $\sigma_f$ be the final state of the trace. Copy the semantics from the LTL semantics \Cref{ltlsem}, and add the following to them:
+  Let $\sigma_f$ be the final state of the trace. Copy the semantics from the LTL semantics (\Cref{ltlsem}), and add the following to them:
   \begin{align*}
     \sigma_f &\vDash_{IELTL} \bigcirc \varphi \tiff \sigma_f \vDash_{IELTL} \varphi\\
     \sigma_f &\vDash_{IELTL} \varphi \U \psi \tiff \sigma_f \vDash_{IELTL} \psi
@@ -246,6 +246,7 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
     \end{cases}
   \]
 \end{defn}
+
 % TODO define how to decide or with top^p etc
 
 \subsection{Timed Propositional Temporal Logic}
@@ -278,7 +279,7 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
   TPTL has the same abbreviations as LTL, plus abbreviations for comparison operations between terms such as $\pi_1 < \pi_2 := \pi_1 \leq \pi_2 \land \neg(\pi_2 \leq \pi_1)$, and so on as expected for $>,\geq,=,\neq$.
 \end{notn}
 
-\begin{defn}{TPTL Semantics}
+\begin{defn}{TPTL Semantics}\label{tptlsem}
 
   Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
   TPTL uses the same semantics as LTL for those operators which overlap with LTL, except the relation is defined over a time trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{LTL}\cdots$ with $\rho\vDash_{TPTL,\eval}\cdots$. The remainder of the definition is as follows:
@@ -291,8 +292,23 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 % TODO examples of specifications
 \subsection{Finite TPTL}
 
-% TODO IE-TPTL
-\subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
+\subsubsection{IE-TPTL} As in IE-LTL, in IE-TPTL we assume that the final state of a trace repeats forever.  I'm not sure if this has been studied before. In \textcite{chai2013rewriting} a runtime verification algorithm for TPTL is introduced, which look like IE-TPTL, but it is not clear if that's what is used.\\
+In IE-TPTL, the only difference from TPTL is the semantics in the final state. The syntax remains the same as in TPTL.
+
+\begin{defn}{IE-TPTL semantics}
+
+  Let $\rho_f$ be the final state of the time trace. Copy the semantics from the TPTL semantics (\Cref{tptlsem}), and add the following to them:
+  \begin{align*}
+    \rho_f &\vDash_{IETPTL} \bigcirc \varphi \tiff \rho_f \vDash_{IETPTL} \varphi\\
+    \rho_f &\vDash_{IETPTL} \varphi \U \psi \tiff \rho_f \vDash_{IETPTL} \psi
+  \end{align*}
+\end{defn}
+
+\begin{remk}
+IE-TPTL has some interesting consequences when applied to timed formulae. For example, the formula $\Box x.~ \Diamond y.~ y > x$ is always false, since the time of the final state is repeated forever. I suspect another solution is desirable, such as assuming the time will be increasing forever. It is unclear to me what the most elegant solution is.
+\end{remk}
+
+\subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The broad idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
 
 \begin{defn}{RV-TPTL Syntax}
 
@@ -304,7 +320,7 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 
   Take the standard abbreviations for TPTL (\Cref{tptlabbrev}) and add the abbreviations \(\top^P := \neg \bot^P\) and $\wn \varphi:= \neg \sn \neg \varphi$.
 \end{notn}
-\begin{defn}{RV-TPTL Semantics}
+\begin{defn}{RV-TPTL Semantics}\label{rvtptlsem}
 
   I will give the semantics based on TPTL, in cases as RV-LTL was given. Let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times as in TPTL.
   The notation $\rho\omega$ refers to the concatenation of the infinite time trace $\omega$ to the finite time trace $\rho$.
@@ -318,9 +334,9 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
   \]
 
   Let $\vDash_{FT}$ be defined by taking TPTL semantics and adding:
-  \begin{align*}
-    \rho&\vDash_{FT}\sn\varphi \tiff \rho^1\vDash_{FT}\varphi \tand \rho^1 \neq \epsilon\\
-    \rho&\vDash_{FT}\wn\varphi \tiff \rho^1\vDash_{FT}\varphi \tor \rho^1 = \epsilon
+  \begin{align*}\label{ftsem}
+    \rho&\vDash_{FT}\sn\varphi \tiff \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
+    \rho&\vDash_{FT}\wn\varphi \tiff \rho^1\vDash_{TPTL}\varphi \tor \rho^1 = \epsilon
   \end{align*}
 
   Finally, define $\vDash_{RV-TPTL}$, the satisfaction relation for RV-TPTL, by the following:
@@ -332,6 +348,35 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
       \bot^P & \text{if } \sigma \vDash_{T3} \varphi = ~?\tand \sigma\vDash_{FT} = \bot
     \end{cases}
   \]
+\end{defn}
+
+In my implementation of RV-TPTL, I have made a modification of the semantics. Instead of propositional variables as the atoms of the logic, we have functions from any domain to boolean truth values.
+
+\begin{defn}{Generalised RV-TPTL Semantics}
+
+  Let $f:D\to\{\bot,\top\}$ be a function with a domain $D$. Let $\sigma\in D^+$ be a state sequence of $D$ (rather than $P$, as in previous definition). Then take the semantics of TPTL (\Cref{tptlsem}), and replace the rule for propositional variables (inherited from LTL) with:
+  \[ \rho \vDash f \tiff f(\sigma_0)\\ \]
+
+  Then define the semantics of the next operators:
+  \begin{align*}
+    \rho&\vDash\sn\varphi =
+    \begin{cases}
+      \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
+      \bot^P &\text{if } \rho^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}\\
+    \rho&\vDash\wn\varphi =
+    \begin{cases}
+      % \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tor \rho^1 = \epsilon\\
+      \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
+      \top^P &\text{if } \rho^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}
+  \end{align*}
+
+  Then modify the sematics of $\lor$ to be the least upper bound of the disjuncts, where the truth values have the ordering \(\top>\top^P>\bot^P>\bot\):
+  \[\] % FIXME
+
 \end{defn}
 
 \section{Runtime Verification using Formula Rewriting}
@@ -396,13 +441,19 @@ Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ for the remainder of the section.
 \subsection{Related Work}
 Formula rewriting was devised for LTL in \textcite{rosu2005rewriting}, as part of the Java PathExplorer project, and has been used in some NASA programs. The technique was revised for TPTL in \textcite{chai2013rewriting}, with a case study of its potential for use in a train control system. In both of these works, a separate rewrite engine called Maude~\autocite{clavel2002maude} was used. In the next section I discuss the implementation of my rewrite based verification tool, which does not use Maude.
 
-\section{Implementation in Scala}
-I have implemented a runtime verifier in the Scala programming language. It is embedded into Scala as an internal Domain Specific Language (DSL), this is also known as a shallow embedding. I allow the user to choose a logic, either RV-TPTL or IE-TPTL.
+\section{Implementation in Scala}\label{implementaion}
+I have implemented a runtime verifier in the Scala programming language.
+It is embedded into Scala as an internal Domain Specific Language (DSL), this is also known as a shallow embedding.
+I allow the user to choose a logic, either RV-TPTL or IE-TPTL.
 % shallow embedding / internal DSL ref TraceContract
 \subsection{Shallow Embedding}
-My implementation
 \subsection{Formula Rewriting}
 \subsection{Runtime Verification}
+
+\subsubsection{IE-TPTL}
+\subsubsection{RV-TPTL}
+My implementation of RV-TPTL is a slight simplification of the semantics which is equivalent~({\color{red}TODO: prove?}). % TODO prove equivalent
+
 
 % TODO time abbreviations (free vars)
 
