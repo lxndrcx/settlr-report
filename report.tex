@@ -376,8 +376,8 @@ In my implementation of RV-TPTL, I have made a modification of the semantics. In
     \end{cases}
   \end{align*}
 
-  Then modify the sematics of $\lor$ to be the least upper bound of the disjuncts, where the truth values have the ordering \(\top>\top^P>\bot^P>\bot\):
-  \[\] % FIXME
+  Then modify the semantics of $\lor$ to be the least upper bound~\autocite[654]{bauer2010comparing} of the disjuncts, where the truth values have the ordering \(\top\geq\top^P\geq\bot^P\geq\bot\). Let $\sqcap$ be the least upper bound operator, then:
+  \[\rho\vDash\varphi\lor\psi := (\rho\vDash\varphi) \sqcap (\rho\vDash\psi)\]
 
 \end{defn}
 
