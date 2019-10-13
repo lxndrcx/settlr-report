@@ -250,7 +250,11 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 % TODO define how to decide or with top^p etc
 
 \subsection{Timed Propositional Temporal Logic}
-Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extension of LTL to encode explicit time into the logic. In LTL, only the order of states is reasoned about, i.e., $\sigma_i$ is before $\sigma_{i+1}$, but for many verification problems it can be useful to reason about the explicit time at which a state occurs, i.e., $\sigma_i$ is 3 time units earlier than $\sigma_{i+1}$. For this we define a time trace which contains the sequence of times corresponding to the sequence of states. A quantifier called a \emph{freeze operator} is added to the logic, which binds occurrences of a variable to the time at which the operator is evaluated. Integer comparison is added to the logic, to allow for specifications such as: ``If $p$ becomes true, $q$ will become true within 5 time units".
+Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extension of LTL to encode explicit time into the logic.
+In LTL, only the order of states is reasoned about, i.e., $\sigma_i$ is before $\sigma_{i+1}$, but for many verification problems it can be useful to reason about the explicit time at which a state occurs, i.e., $\sigma_i$ is 3 time units earlier than $\sigma_{i+1}$.
+For this we define a time trace which contains the sequence of times corresponding to the sequence of states.
+A quantifier called a \emph{freeze operator} is added to the logic, which binds occurrences of a variable to the time at which the operator is evaluated.
+Integer comparison is added to the logic, to allow for specifications such as: ``If $p$ becomes true, $q$ will become true within 5 time units''.
 
 % TODO say how TPTL generalises LTL, thanks Peter
 
@@ -260,7 +264,7 @@ Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extensi
   A Timed Trace $\rho = (\sigma,\tau)$ is a pair of a trace (state sequence) $\sigma \in P^+$ and a time sequence $\tau \in \mathbb{N}^+$ which is a sequence of non-negative integers that is monotonically non-decreasing ($\forall i. ~\tau_i \leq \tau_{i+1}$) and eventually always increasing ($\forall i. \exists j. ~\tau_i < \tau_j$).
 \end{defn}
 
-Assume there exist an infinite supply of time variables  and let $V=\{x,y,z...\}$ be the set of these variables.
+Assume there exist an infinite supply of time variables  and let $V=\{x,y,z\dots\}$ be the set of these variables.
 
 \begin{defn}{TPTL Syntax}\label{tptlsyn}
   Let $a\in P$ be a propositional variable, $x\in V$ be a time variable and $c\in\mathbb{N}$ a constant.
@@ -381,6 +385,8 @@ In my implementation of RV-TPTL, I have made a modification of the semantics. In
 
 \end{defn}
 
+The generalised RV-TPTL semantics are equivalent to the standard RV-TPTL semantics, but easier to implement with rewrites. % TODO proof?
+
 \section{Runtime Verification using Formula Rewriting}
 \subsection{Formula Rewriting}
 Formula rewriting~\autocite{rosu2005rewriting}, or formula progression, is a technique used in runtime verification.
@@ -408,7 +414,7 @@ Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ for the remainder of the section.
 
 \begin{eg}{Apples}
 
-  For a timed example in RV-TPTL, consider a container of apples which needs to be delivered to a store within a specified time. Let $V=\{sent, received\}$, \(\rho=((\{sent\},\{received\}),(1,4)),\) and \(\varphi=\Box x. (sent \to \Diamond y. (received \land y \leq x + 3)).\)
+  For a timed example in RV-TPTL, consider a container of apples which needs to be delivered to a store within a specified time. Let $V=\{sent, received\}$, \(\rho=((\{sent\},\{received\}),(1,4))\), and \(\varphi=\Box x. (sent \to \Diamond y. (received \land y \leq x + 3))\).
   The trace $\rho$ will presumably satisfy the formula.
   Here is the progression:
   \begin{align}
@@ -454,7 +460,6 @@ I allow the user to choose a logic, either RV-TPTL or IE-TPTL.
 
 \subsubsection{IE-TPTL}
 \subsubsection{RV-TPTL}
-My implementation of RV-TPTL is a slight simplification of the semantics which is equivalent~({\color{red}TODO: prove?}). % TODO prove equivalent
 
 
 % TODO time abbreviations (free vars)
@@ -470,5 +475,9 @@ My implementation of RV-TPTL is a slight simplification of the semantics which i
 \printbibliography{}
 \newpage
 \section{Appendix}\label{appendix}
+\subsection{Authorship Declarations}
+The formula rewriting functions in the \texttt{progress} object were originally written by my supervisor Peter Baumgartner as a formula progression calculator for another project. I have modified them to suit my project, but they are substantially similar. There were other function in \texttt{progress} which I removed.
+
+The original structure of the \texttt{Formula} classes was taken from Peter's work, but substantially modified. The main remnants are some of the names of classes, some variable declarations and the \texttt{compl} method of \texttt{Formula}.
 
 \end{document}
