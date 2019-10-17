@@ -147,7 +147,7 @@ Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\si
   \begin{align}
     \Box \varphi &\equiv \varphi \land \bigcirc \Box \varphi\label{elbox}\\
     \Diamond \varphi &\equiv \varphi \lor \bigcirc \Diamond \varphi\label{eldiamond}\\
-    \psi \U \varphi &\equiv \varphi \lor \bigcirc \psi \U \varphi\label{elU}
+    \psi \U \varphi &\equiv \varphi \lor (\psi \land \bigcirc (\psi \U \varphi))\label{elU}
   \end{align}
 
 \end{lem}
@@ -223,7 +223,7 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
   \begin{align}
     \Box \varphi \equiv \varphi \land \wn \Box \varphi \label{felBox}\\
     \Diamond \varphi \equiv \varphi \lor \sn \Diamond \varphi\label{felDiamond}\\
-    \psi \U \varphi \equiv \varphi \lor \sn \psi \U \varphi\label{felU}
+    \psi \U \varphi \equiv \varphi \lor (\psi \land \sn (\psi \U \varphi))\label{felU}
   \end{align}
 
 \end{lem}
