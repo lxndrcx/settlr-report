@@ -531,11 +531,11 @@ My verifier is structured as a library which can be integrated into other Scala 
 When implementing a Domain Specific Language, it is possible to write an internal or external DSL, also known as shallow or deep embedded DSLs respectively. In a deep embedding, the implementer is required to create a parser which translates the DSL into another another form for evaluation. In a shallow embedding, the DSL takes form within the parent language, delegating the parsing to the parser of the language, which has already been written and tested. The terms of the DSL become types within the parent language and then the implementer can use the libraries and infrastructure provided by for that language~
 \autocite{gibbons2014foldingdeepshallow}.
 
-In the case of this project, I have written a shallow embedding of IE-TPTL and RV-TPTL in the programming language Scala~\autocite{}
-
-I was partly inspired by some of the syntax examples in \textcite{barringer2011tracecontract}.
-\subsection{Formula Rewriting}
+In the case of this project, I have written a shallow embedding of IE-TPTL and RV-TPTL in the programming language Scala~\autocite{Odersky04scala}. I was partly inspired by some of the syntax examples in \textcite{barringer2011tracecontract}. Using Scala classes, methods, and implicits I have constructed a convenient DSL for specifying temporal properties.
 \subsection{Runtime Verification}
+\subsubsection{Formula Rewriting}
+I have implemented a runtime verifier on top of the shallow embedded DSL for timed temporal logic. It uses a formula rewriting algorithm.
+Other works on rewriting algorithms that I have read~\autocites{rosu2005rewriting,chai2013rewriting} used the rewriting engine Maude~\autocite{clavel2002maude} to perform their rewrites. This is not my approach.
 
 \subsubsection{IE-TPTL}
 TODO
@@ -549,6 +549,7 @@ TODO
 \end{lstlisting}
 % FIXME put in listing
 \subsubsection{RV-TPTL}
+My implementation is an approximation of RV-TPTL, since the simplification methods do not detect all tautologies.
 TODO
 \begin{eg}{RV-TPTL verification examples}
   TODO
