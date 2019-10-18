@@ -66,6 +66,14 @@
 
 \begin{abstract} % TODO
   TODO
+  % What are you trying to do? Articulate your objectives using absolutely no jargon.
+  % How is it done today, and what are the limits of current practice?
+  % What's new in your approach and why do you think it will be successful?
+  % Who cares? If you're successful, what difference will it make?
+  % What are the risks and the payoffs?
+  % How much will it cost?
+  % How long will it take?
+  % What are the midterm and final "exams" to check for success?
 \end{abstract}
 \newpage
 \tableofcontents
@@ -92,7 +100,7 @@ Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic cre
 \begin{defn}{LTL Syntax}
 
   An LTL formula $\varphi$ is inductively defined in as follows\footnote{In Bachus-Naur form}:
-  \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U\varphi\]
+  \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U\varphi\]
 \end{defn}
 \begin{notn}{LTL Abbreviations}\label{ltlabbrev}
 
@@ -100,11 +108,11 @@ Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic cre
   \begin{align*}
     \top &:= \neg \bot\\
     \varphi \to \psi &:= \neg \varphi \lor \psi\\
-    \varphi \land \psi &:= \neg (\neg \varphi \lor \neg \psi)\\
     \varphi \leftrightarrow \psi &:= (\varphi \to \psi) \land (\psi \to \varphi)\\
     \Diamond \varphi &:= \top \U{} \varphi\\
     \Box \varphi &:= \neg\Diamond\neg\varphi
   \end{align*}
+  I do not abbreviate $\land$ because it is needed in the explicit syntax so that formulae can be represented in negation normal form and disjunctive normal form, which is necessary for formula rewriting.
 \end{notn}
 
 We read $\top$ as `true', $\bot$ as `false', $\bigcirc$ as `next', $\Diamond$ as `eventually', $\Box$ as `always', and $\U$ as `until'.
@@ -172,10 +180,21 @@ TODO expand
 \subsubsection{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state. The syntax remains the same as in LTL.
 \begin{defn}{IE-LTL semantics}
 
-  Let $\sigma_f$ be the final state of the trace. Define the satisfaction relation for IE-LTL $\vDash_{\text{IE-LTL}}$ as follows. Copy the semantics from the LTL semantics (\Cref{ltlsem}), and add the following to them:
+  %Let $\sigma_f$ be the final state of the trace.
+  Define the satisfaction relation for IE-LTL $\vDash_{\text{IE-LTL}}$ as follows. Copy the semantics from the LTL semantics (\Cref{ltlsem}) except for the `next' (\bigcirc) and `until' $\U$ operators, and redefine them as follows:
   \begin{align*}
-    \sigma_f &\vDash \bigcirc \varphi \tiff \sigma_f \vDash \varphi\\
-    \sigma_f &\vDash \varphi \U \psi \tiff \sigma_f \vDash \psi
+    \sigma &\vDash \bigcirc \varphi =
+      \begin{cases}
+        \top &\text{if } \sigma^1 \vDash \varphi \tand \sigma^1 \ne \epsilon\\
+        \top &\text{if } \sigma \vDash \varphi \tand \sigma^1 = \epsilon\\
+        \bot &\text{otherwise}
+      \end{cases}\\
+    \sigma &\vDash \varphi \U \psi =
+    \begin{cases}
+      \top &\text{if } \sigma^i \vDash \psi \fsome i > 0 \tand \sigma^j \vDash \varphi \fall 0 \leq j < i\\
+      \top &\text{if } \sigma \vDash \psi \tand \sigma^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}
   \end{align*}
 \end{defn}
 
@@ -192,14 +211,14 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 \begin{defn}{FLTL Syntax}
 
   A FLTL formula $\varphi$ is inductively defined in as follows:
-  \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \sn \varphi ~|~ \varphi \U\varphi\]
+  \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \sn \varphi ~|~ \wn \varphi ~|~ \varphi \U\varphi\]
 
   $\sn$ is pronounced `strong next'.
 \end{defn}
 
 \begin{notn}{FLTL abbreviations}\label{fltlabbrev}
 
-  Take the standard abbreviations for LTL (\Cref{ltlabbrev}) and add the abbreviation $\wn \varphi:= \neg \sn \neg \varphi$. $\wn$ is pronounced `weak next'.
+  Take the standard abbreviations for LTL (\Cref{ltlabbrev}).% and add the abbreviation $\wn \varphi:= \neg \sn \neg \varphi$. $\wn$ is pronounced `weak next'.
 \end{notn}
 
 \begin{defn}{FLTL semantics}
@@ -238,7 +257,7 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 \begin{defn}{\ltlt\ Syntax}
 
   A \ltlt\ formula $\varphi$ is inductively defined in as follows:
-  \[\varphi ::= a ~|~ \bot ~|~ ? ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \U\varphi\]
+  \[\varphi ::= a ~|~ \bot ~|~ ? ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \varphi \U\varphi\]
 
   $?$ is pronounced `unknown'.
 \end{defn}
@@ -264,14 +283,14 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 \begin{defn}{RV-LTL Syntax}
 
   An RV-LTL formula $\varphi$ is inductively defined in as follows:
-  \[\varphi ::= a ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \sn \varphi ~|~ \varphi \U\varphi\]
+  \[\varphi ::= a ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \sn \varphi ~|~ \wn \varphi ~|~ \varphi \U\varphi\]
 
   $\bot^P$ is pronounced `presumably false'.
 \end{defn}
 
 \begin{notn}{RV-LTL abbreviations}
 
-  Take the standard abbreviations for FLTL (\Cref{fltlabbrev}) and add the abbreviation $\top^P \varphi:= \neg \bot^P$. The constant $\top^P$ is pronounced `presumably true'.
+  Take the standard abbreviations for FLTL (\Cref{fltlabbrev}) and add the abbreviation $\top^P := \neg \bot^P$. The constant $\top^P$ is pronounced `presumably true'.
 \end{notn}
 
 \begin{defn}{RV-LTL semantics}
@@ -318,7 +337,7 @@ Assume there exist an infinite supply of time variables  and let $V=\{x,y,z\dots
   TPTL terms $\pi$ and formulas $\varphi$ are inductively defined as follows:
   \begin{align*}
     \pi &::= x + c ~|~ c\\
-    \varphi &::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
+    \varphi &::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
   \end{align*}
 \end{defn}
 
@@ -331,11 +350,11 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 
 \begin{defn}{TPTL Semantics}\label{tptlsem}
 
-  Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
-  TPTL uses the same semantics as LTL for those operators which overlap with LTL, except the relation is defined over a time trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{\text{LTL}}\cdots$ with $\rho\vDash_{\text{TPTL},\eval}\cdots$. The remainder of the definition is as follows:
+  Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
+  TPTL uses the same semantics as LTL (\Cref{ltlsem}) for those operators which overlap with LTL, except the relation is defined over a time trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{\text{LTL}}\cdots$ with $\rho\vDash_{\text{TPTL},\eval}\cdots$. The remainder of the definition is as follows:
   \begin{align*}
-    \rho&\vDash_{\text{TPTL},\eval}\pi_1\leq\pi_2 \tiff \eval(\pi_1)\leq\eval(\pi_2)\\
-    \rho&\vDash_{\text{TPTL},\eval} x.\varphi \tiff \rho\vDash_{\text{TPTL},\eval[x:=\tau_0]}\varphi
+    \rho,\eval &\vDash_{\text{TPTL}}\pi_1\leq\pi_2 \tiff \eval(\pi_1)\leq\eval(\pi_2)\\
+    \rho,\eval &\vDash_{\text{TPTL}} x.\varphi \tiff \rho\vDash_{\text{TPTL},\eval[x:=\tau_0]}\varphi
   \end{align*}
 \end{defn}
 
@@ -353,8 +372,8 @@ In IE-TPTL, the only difference from TPTL is the semantics in the final state. T
 
   Let $\rho_f$ be the final state of the time trace. Define the semantic relation $\vDash_{\text{IE-TPTL}}$ of IE-TPTL as follows.Copy the semantics from the TPTL semantics (\Cref{tptlsem}), and add the following to them:
   \begin{align*}
-    \rho_f &\vDash \bigcirc \varphi \tiff \rho_f \vDash \varphi\\
-    \rho_f &\vDash \varphi \U \psi \tiff \rho_f \vDash \psi
+    \rho_f,\eval &\vDash \bigcirc \varphi \tiff \rho_f \vDash \varphi\\
+    \rho_f,\eval &\vDash \varphi \U \psi \tiff \rho_f \vDash \psi
   \end{align*}
 \end{defn}
 
@@ -374,87 +393,88 @@ IE-TPTL has some interesting consequences when applied to timed formulae. For ex
   Define the formulas of RV-TPTL as:
   \begin{align*}
     \pi &::= x + c ~|~ c\\
-    \varphi &::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \sn \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
+    \varphi &::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \and \varphi ~|~ \sn \varphi ~|~ \wn \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
   \end{align*}
 \end{defn}
 \begin{notn}{RV-TPTL abbreviations}
 
-  Take the standard abbreviations for TPTL (\Cref{tptlabbrev}) and add the abbreviations \(\top^P := \neg \bot^P\) and $\wn \varphi:= \neg \sn \neg \varphi$.
+  Take the standard abbreviations for TPTL (\Cref{tptlabbrev}) and add the abbreviations \(\top^P := \neg \bot^P\).% and $\wn \varphi:= \neg \sn \neg \varphi$.
 \end{notn}
 \begin{defn}{RV-TPTL Semantics}\label{rvtptlsem}
 
   I will give the semantics based on TPTL, in a analogous way to how RV-LTL was given.
-  Let $\eval:V\to\mathbb{N}$ be a evaluation of time variables to times as in TPTL.
+  Let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times as in TPTL (\Cref{tptlsem}).
   The notation $\rho\omega$ refers to the concatenation of the infinite time trace $\omega$ to the finite time trace $\rho$.
   I will define two semantic relations in order to then define the RV-TPTL semantics. These are essentially TPTL$_3$ and FTPTL respectively.
 
   Let $\vDash_{T3}$ be given by:
-  \[\rho\vDash_{T3}\varphi = \begin{cases}
-      \top & \text{if } \rho\omega \vDash_{TPTL,\eval} \varphi \fall \omega \in (P^+,\mathbb{N}^+)\\
-      \bot & \text{if }  \rho\omega \vDash_{TPTL,\eval} \varphi \fall \omega \in (P^+,\mathbb{N}^+)\\
+  \[\rho,\eval\vDash_{T3}\varphi = \begin{cases}
+    \top & \text{if } \rho\omega,\eval \vDash_{\text{TPTL}} \varphi \fall \omega \in (P^+,\mathbb{N}^+)\\
+    \bot & \text{if }  \rho\omega,\eval \vDash_{\text{TPTL}} \varphi \fall \omega \in (P^+,\mathbb{N}^+)\\
       ? & \text{otherwise}
     \end{cases}
   \]
 
   Let $\vDash_{FT}$ be defined by taking TPTL semantics and adding:
   \begin{align*}\label{ftsem}
-    \rho&\vDash_{FT}\sn\varphi \tiff \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
-    \rho&\vDash_{FT}\wn\varphi \tiff \rho^1\vDash_{TPTL}\varphi \tor \rho^1 = \epsilon
+    \rho,\eval&\vDash_{FT}\sn\varphi \tiff \rho^1,\eval\vDash_{TPTL}\varphi \tand \rho^1,\eval \neq \epsilon\\
+    \rho,\eval&\vDash_{FT}\wn\varphi \tiff \rho^1,\eval\vDash_{TPTL}\varphi \tor \rho^1,\eval = \epsilon
   \end{align*}
 
   Finally, define $\vDash_{\text{RV-TPTL}}$, the satisfaction relation for RV-TPTL, by the following:
   \[\rho\vDash_{\text{RV-TPTL}}\varphi =
     \begin{cases}
-      \top & \text{if } \sigma \vDash_{T3} \varphi = \top\\
-      \bot & \text{if } \sigma \vDash_{T3} \varphi = \bot\\
-      \top^P & \text{if } \sigma \vDash_{T3} \varphi = ~?\tand \sigma\vDash_{FT} = \top \\
-      \bot^P & \text{if } \sigma \vDash_{T3} \varphi = ~?\tand \sigma\vDash_{FT} = \bot
+      \top & \text{if } \rho,\eval\vDash_{T3} \varphi = \top\\
+      \bot & \text{if } \rho,\eval \vDash_{T3} \varphi = \bot\\
+      \top^P & \text{if } \rho,\eval \vDash_{T3} \varphi = ~?\tand \rho,\eval\vDash_{FT} = \top \\
+      \bot^P & \text{if } \rho,\eval \vDash_{T3} \varphi = ~?\tand \rho,\eval\vDash_{FT} = \bot
     \end{cases}
   \]
 \end{defn}
 
-\begin{eg}{TPTL examples}
+\begin{eg}{RV-TPTL examples}
   TODO
 \end{eg}
 % TODO examples
 
-In my implementation of RV-TPTL, I have made a modification of the semantics. Instead of propositional variables as the atoms of the logic, we have functions from any domain to boolean truth values. I have also simplified the specification of the logic, by removing references to infinite suffixes.
+In my implementation of RV-TPTL, I have made a modified and approximated the semantics. See \Cref{implementaion} for details.
 
-\begin{defn}{Generalised RV-TPTL Semantics}
+\subsubsection{Decision procedure for RV-TPTL}
+% \begin{defn}{Generalised RV-TPTL Semantics}
 
-  Let $f:D\to\{\bot,\top\}$ be a function with a domain $D$. Let $\sigma\in D^+$ be a state sequence of $D$ (rather than $P$, as in previous definition). Then take the semantics of TPTL (\Cref{tptlsem}), and replace the rule for propositional variables (inherited from LTL) with:
-  \[ \rho \vDash f \tiff f(\sigma_0)\\ \]
+%   Let $f:D\to\{\bot,\top\}$ be a function with a domain $D$. Let $\sigma\in D^+$ be a state sequence of $D$ (rather than $P$, as in previous definition). Then take the semantics of TPTL (\Cref{tptlsem}), and replace the rule for propositional variables (inherited from LTL) with:
+%   \[ \rho \vDash f \tiff f(\sigma_0)\\ \]
 
-  Then replace the next rule with the following two rules:
-  \begin{align*}
-    \rho&\vDash\sn\varphi =
-    \begin{cases}
-      \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
-      \top &\text{if } \varphi \text{ is a tautology}\\
-      \bot^P &\text{if } \rho^1 = \epsilon \tand \varphi \text{ is not a tautology}\\
-      \bot &\text{otherwise}
-    \end{cases}\\
-    \rho&\vDash\wn\varphi =
-    \begin{cases}
-      % \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tor \rho^1 = \epsilon\\
-      \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
-      \top &\text{if } \varphi \text{ is a tautology}\\
-      \top^P &\text{if } \rho^1 = \epsilon \tand \varphi \text{ is not a tautology}\\
-      \bot &\text{otherwise}
-    \end{cases}
-  \end{align*}
+%   Then replace the next rule with the following two rules:
+%   \begin{align*}
+%     \rho&\vDash\sn\varphi =
+%     \begin{cases}
+%       \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
+%       \top &\text{if } \varphi \text{ is a tautology}\\
+%       \bot^P &\text{if } \rho^1 = \epsilon \tand \varphi \text{ is not a tautology}\\
+%       \bot &\text{otherwise}
+%     \end{cases}\\
+%     \rho&\vDash\wn\varphi =
+%     \begin{cases}
+%       % \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tor \rho^1 = \epsilon\\
+%       \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
+%       \top &\text{if } \varphi \text{ is a tautology}\\
+%       \top^P &\text{if } \rho^1 = \epsilon \tand \varphi \text{ is not a tautology}\\
+%       \bot &\text{otherwise}
+%     \end{cases}
+%   \end{align*}
 
-  Then modify the semantics of $\lor$ to be the least upper bound~\autocite[654]{bauer2010comparing} of the disjuncts, where the truth values have the ordering \(\top\geq\top^P\geq\bot^P\geq\bot\). The least upper bound is essentially the maximum of the disjuncts. Let $\sqcap$ be the least upper bound operator, then:
-  \[\rho\vDash\varphi\lor\psi := (\rho\vDash\varphi) \sqcap (\rho\vDash\psi)\]
+%   Then modify the semantics of $\lor$ to be the least upper bound~\autocite[654]{bauer2010comparing} of the disjuncts, where the truth values have the ordering \(\top\geq\top^P\geq\bot^P\geq\bot\). The least upper bound is essentially the maximum of the disjuncts. Let $\sqcap$ be the least upper bound operator, then:
+%   \[\rho\vDash\varphi\lor\psi := (\rho\vDash\varphi) \sqcap (\rho\vDash\psi)\]
 
-\end{defn}
+% \end{defn}
 
-The generalised RV-TPTL semantics are equivalent to the standard RV-TPTL semantics, but easier to implement with rewrites. % TODO proof?
+% The generalised RV-TPTL semantics are equivalent to the standard RV-TPTL semantics, but easier to implement with rewrites. % TODO proof?
 
-\begin{remk}
-  Let $D = P$, and let there be functions $f_a,f_b,\dots$ for every variable $a,b,\dots\in P$ such that $f_a(\sigma_i) \tiff a\in \sigma_i$. Then the generalised RV-TPTL can simulate the atoms of the standard RV-TPTL, by replacing each atom $a$ in a formula with $f_a$.
+% \begin{remk}
+%   Let $D = P$, and let there be functions $f_a,f_b,\dots$ for every variable $a,b,\dots\in P$ such that $f_a(\sigma_i) \tiff a\in \sigma_i$. Then the generalised RV-TPTL can simulate the atoms of the standard RV-TPTL, by replacing each atom $a$ in a formula with $f_a$.
 
-\end{remk}
+% \end{remk}
 
 \section{Runtime Verification using Formula Rewriting}
 \subsection{Formula Rewriting}
