@@ -77,7 +77,7 @@
 \end{abstract}
 \newpage
 \tableofcontents
-% \newpage
+\newpage
 
 \section{Introduction}
 \subsection{Runtime Verification}
@@ -97,12 +97,12 @@ TODO expand?
 
 \subsection{Linear Temporal Logic}
 Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic created for model checking. It's syntax and semantics follow. Assume that we have an infinite supply of propositional variables $a,b,c,\dots$.
-\begin{defn}{LTL Syntax}
+\begin{defn}[LTL Syntax]
 
   An LTL formula $\varphi$ is inductively defined in as follows\footnote{In Bachus-Naur form}:
   \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U\varphi\]
 \end{defn}
-\begin{notn}{LTL Abbreviations}\label{ltlabbrev}
+\begin{notn}[LTL Abbreviations]\label{ltlabbrev}
 
   The following standard abbreviations are made:
   \begin{align*}
@@ -119,12 +119,12 @@ We read $\top$ as `true', $\bot$ as `false', $\bigcirc$ as `next', $\Diamond$ as
 
 The formulae of LTL are interpreted over sequences of states called traces.
 
-\begin{defn}{Traces and states}
+\begin{defn}[Traces and states]
 
   Let $P$ be a set of propositional variables. A \emph{state} $\sigma_i \subseteq P$ is a set of propositional variables which are interpreted as true. A \emph{trace} $\sigma \in P^+$ is an infinite sequence of states.
 \end{defn}
 
-\begin{notn}{Satisfaction Relations}
+\begin{notn}[Satisfaction Relations]
 
   Let $\vDash_{\text{S}}$ signify semantics entailment in the system S, and call it the satisfaction relation for S. If the system is clear from the context I just write $\vDash$
 
@@ -134,7 +134,7 @@ The formulae of LTL are interpreted over sequences of states called traces.
 Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\sigma^i$ is $\sigma$ with the first $i$ elements removed, and $\epsilon$ is the empty sequence.
 \end{notn}
 
-\begin{defn}{LTL Semantics}\label{ltlsem}
+\begin{defn}[LTL Semantics]\label{ltlsem}
 
   Let $P$ be a set of propositional variables and $\sigma$ a trace. The satisfaction relation $\vDash_{\text{LTL}}$ is inductively defined as follows:
 \begin{align*}
@@ -149,7 +149,7 @@ Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\si
 
 \end{defn}
 
-\begin{lem}{Expansion laws}\label{ltlexp}
+\begin{lem}[Expansion laws]\label{ltlexp}
 
   In LTL, the following equivalences hold:
   \begin{align}
@@ -163,10 +163,11 @@ Let $\sigma$ be a sequence, then $\sigma_i$ is the $i$th state in $\sigma$, $\si
 TODO reference proof
 % TODO ref proof
 
-\begin{eg}{LTL examples}
-  TODO what kind of examples?
+\begin{eg}[LTL example]\label{ltleg}
+  Let $r,y,g\in P$ and $\varphi = \Box g \to (\neg r \U y)$ be an LTL formula. Think of $r,y,g$ as red, yellow and green lights being activated i.e., traffic lights. Then the formula $\varphi$ specifies the property that after a green light, there should always be a yellow light before a red light.
+
+  The trace $(\{g\},\{r\},\dots)$ violates $\varphi$. The trace $(\{g\},\{g\},\{g\},\dots)$ satisfies it, as does $(\{g\},\{y\},\{r\},\{g\},\{y\},\{r\},\dots)$.
 \end{eg}
-% TODO Examples
 
 
 \subsection{Finite LTL}
@@ -178,10 +179,10 @@ TODO expand
 % TODO expand
 
 \subsubsection{IE-LTL} The idea behind IE-LTL is to assume that the final state of a trace repeats forever. For IE-LTL, the only difference in the semantics is in the final state. The syntax remains the same as in LTL.
-\begin{defn}{IE-LTL semantics}
+\begin{defn}[IE-LTL semantics]\label{ieltlsem}
 
   %Let $\sigma_f$ be the final state of the trace.
-  Define the satisfaction relation for IE-LTL $\vDash_{\text{IE-LTL}}$ as follows. Copy the semantics from the LTL semantics (\Cref{ltlsem}) except for the `next' (\bigcirc) and `until' $\U$ operators, and redefine them as follows:
+  Define the satisfaction relation for IE-LTL $\vDash_{\text{IE-LTL}}$ as follows. Copy the semantics from the LTL semantics (\Cref{ltlsem}) except for the `next' $\bigcirc$ and `until' $\U$ operators, and redefine them as follows:
   \begin{align*}
     \sigma &\vDash \bigcirc \varphi =
       \begin{cases}
@@ -196,19 +197,26 @@ TODO expand
       \bot &\text{otherwise}
     \end{cases}
   \end{align*}
+  A full definition is given in Appendix \ref{fulldef} as \Cref{ieltlsemfull}.
 \end{defn}
 
-\begin{eg}{IE-LTL examples}
-  TODO
+\begin{eg}[IE-LTL examples]\label{ieltleg}
+  Let $r,y,g\in P$ and $\varphi = \Box (g \to (\neg r \U y))$ be an IE-LTL formula, the same traffic light formula formula from \Cref{ltleg}.
+
+  The trace $(\{g\},\{r\})$ violates $\varphi$. The trace $(\{g\})$ satisfies it, as does $(\{g\},\{y\},\{r\})$.
+
+  Let $\psi = \Box \Diamond g $, be the property saying that there will always be another green.
+
+  The trace $(\{g\},\{r\})$ violates $\psi$, as does $(\{g\},\{y\},\{r\})$. The trace $(\{g\})$ satisfies it.
+
 \end{eg}
-% TODO Examples
 
 
 \subsubsection{FLTL} For FLTL, the next operator of LTL is split into a weak ($\wn$) and strong ($\sn$) version.
 The strong next requires the existence of a next state to be true, while the weak next operator is vacuously true if there is no next state.
 Thus, in the final state, the weak operator evaluates to true, and the strong next to false. The strong and weak next operators are dual of each other, with  $\neg\sn\varphi \equiv \wn\neg\varphi$.
 
-\begin{defn}{FLTL Syntax}
+\begin{defn}[FLTL Syntax]
 
   A FLTL formula $\varphi$ is inductively defined in as follows:
   \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \sn \varphi ~|~ \wn \varphi ~|~ \varphi \U\varphi\]
@@ -216,27 +224,24 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
   $\sn$ is pronounced `strong next'.
 \end{defn}
 
-\begin{notn}{FLTL abbreviations}\label{fltlabbrev}
+\begin{notn}[FLTL abbreviations]\label{fltlabbrev}
 
   Take the standard abbreviations for LTL (\Cref{ltlabbrev}).% and add the abbreviation $\wn \varphi:= \neg \sn \neg \varphi$. $\wn$ is pronounced `weak next'.
 \end{notn}
 
-\begin{defn}{FLTL semantics}
+\begin{defn}[FLTL semantics]\label{fltlsem}
 
-  Define the satisfaction relation for IE-LTL $\vDash_{\text{FLTL}}$ as follows.
+  Define the satisfaction relation for FLTL $\vDash_{\text{FLTL}}$ as follows.
   Copy the standard LTL semantics in \Cref{ltlsem}, and replace the rule for the next operator with:
   \begin{align*}
     \sigma&\vDash\sn\varphi \tiff \sigma^1\vDash\varphi \tand \sigma^1 \neq \epsilon\\
     \sigma&\vDash\wn\varphi \tiff \sigma^1\vDash\varphi \tor \sigma^1 = \epsilon
   \end{align*}
+  A full definition is given in Appendix \ref{fulldef} as \Cref{fltlsemfull}.
 \end{defn}
 
-\begin{eg}{FLTL examples}
-  TODO
-\end{eg}
-% TODO Examples
 
-\begin{lem}{Expansion Laws for FLTL}\label{fltlexp}
+\begin{lem}[Expansion Laws for FLTL]\label{fltlexp}
 
   In FLTL, the following expansion laws are equivalences:
   \begin{align}
@@ -247,6 +252,17 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
 \end{lem}
 
+\begin{eg}[FLTL examples]\label{fltleg}
+  Let $r,y,g\in P$ and $\varphi = \Box (g \to (\neg r \U y))$ be an FLTL formula, the same traffic light formula formula from \Cref{ltleg}.
+
+  The trace $(\{g\},\{r\})$ violates $\varphi$. The trace $(\{g\})$ satisfies it, as does $(\{g\},\{y\},\{r\})$.
+
+  Let $\psi = \Box \Diamond g $, the second property in \Cref{ieltleg}.
+
+  The trace $(\{g\},\{r\})$ violates $\psi$, as does $(\{g\},\{y\},\{r\})$. The trace $(\{g\})$ satisfies $\psi$.
+
+\end{eg}
+
 \begin{proof}
   TODO (From \autocite{bauer2010comparing}.)
   %Bauer 5.3
@@ -254,14 +270,14 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
 \subsubsection{\ltlt} In \ltlt, a new truth value is introduced to represent uncertainty.
 
-\begin{defn}{\ltlt\ Syntax}
+\begin{defn}[\ltlt\ Syntax]
 
   A \ltlt\ formula $\varphi$ is inductively defined in as follows:
   \[\varphi ::= a ~|~ \bot ~|~ ? ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \varphi \U\varphi\]
 
   $?$ is pronounced `unknown'.
 \end{defn}
-\begin{defn}{\ltlt\ semantics}
+\begin{defn}[\ltlt\ semantics]\label{ltltsem}
 
   The semantics for \ltlt\ are defined by cases relying on standard LTL semantics. The notation $\sigma\gamma$ refers to the concatenation of the infinite trace $\gamma$ to the finite trace $\sigma$.
   Define the satisfaction relation for \ltlt $\vDash_{\text{\ltlt}}$ as follows.
@@ -272,15 +288,23 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
       ? & \text{otherwise}
     \end{cases}
     \]
+  % A full definition is given in Appendix \ref{fulldef} as \Cref{ltltsemfull}.
 \end{defn}
 
-\begin{eg}{LTL$_3$ examples}
-  TODO
+It is not obvious on first reading that runtime verification using \ltlt is decidable. A runtime verification procedure for \ltlt is given in \textcite[6]{arafat2005runtime}. The procedure is doubly exponential with respect to the size of the input formula.
+
+\begin{eg}[LTL$_3$ examples]
+Let $r,y,g\in P$ and $\varphi = \Box (g \to (\neg r \U y))$ be an \ltlt formula, the same traffic light formula formula from \Cref{ltleg}.
+
+  The trace $(\{g\},\{r\})$ violates $\varphi$. The trace $(\{g\})$ is inconclusive, as is $(\{g\},\{y\},\{r\})$.
+
+  Let $\psi = \Box \Diamond g $, the second property in \Cref{ieltleg}.
+
+  The trace $(\{g\},\{r\})$ is inconclusive, as is $(\{g\})$, and also $(\{g\},\{y\},\{r\})$.
 \end{eg}
-% TODO Examples
 
 \subsubsection{RV-LTL} RV-LTL is based on FLTL and \ltlt.
-\begin{defn}{RV-LTL Syntax}
+\begin{defn}[RV-LTL Syntax]
 
   An RV-LTL formula $\varphi$ is inductively defined in as follows:
   \[\varphi ::= a ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \sn \varphi ~|~ \wn \varphi ~|~ \varphi \U\varphi\]
@@ -288,12 +312,12 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
   $\bot^P$ is pronounced `presumably false'.
 \end{defn}
 
-\begin{notn}{RV-LTL abbreviations}
+\begin{notn}[RV-LTL abbreviations]
 
   Take the standard abbreviations for FLTL (\Cref{fltlabbrev}) and add the abbreviation $\top^P := \neg \bot^P$. The constant $\top^P$ is pronounced `presumably true'.
 \end{notn}
 
-\begin{defn}{RV-LTL semantics}
+\begin{defn}[RV-LTL semantics]\label{rvltlsem}
 
   The semantics for RV-LTL are also defined by cases.
   Define the satisfaction relation for RV-LTL $\vDash_{\text{RV-LTL}}$ as follows.
@@ -307,10 +331,15 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
   \]
 \end{defn}
 
-\begin{eg}{RV-LTL examples}
-  TODO
+\begin{eg}[RV-LTL examples]
+Let $r,y,g\in P$ and $\varphi = \Box (g \to (\neg r \U y))$ be an RV-LTL formula, the same traffic light formula formula from \Cref{ltleg}.
+
+  The trace $(\{g\},\{r\})$ violates $\varphi$. The trace $(\{g\})$ presumably violates $\varphi$. Finally $(\{g\},\{y\},\{r\})$ presumably satisfies the trace.
+
+  Let $\psi = \Box \Diamond g $, the second property in \Cref{ieltleg}.
+
+  The trace $(\{g\},\{r\})$ presumably violates $\psi$ as does $(\{g\},\{y\},\{r\})$. The trace $(\{g\})$ presumably satisfies $\psi$.
 \end{eg}
-% TODO Examples
 
 \subsection{Timed Propositional Temporal Logic}
 Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extension of LTL to encode explicit time into the logic.
@@ -324,14 +353,14 @@ TPTL is a generalisation of LTL, all properties expressed in LTL are expressible
 % TODO say how TPTL generalises LTL, thanks Peter
 
 
-\begin{defn}{Timed Trace}
+\begin{defn}[Timed Trace]
 
   A Timed Trace $\rho = (\sigma,\tau)$ is a pair of a trace (state sequence) $\sigma \in P^+$ and a time sequence $\tau \in \mathbb{N}^+$ which is a sequence of non-negative integers that is monotonically non-decreasing ($\forall i. ~\tau_i \leq \tau_{i+1}$) and eventually always increasing ($\forall i. \exists j. ~\tau_i < \tau_j$).
 \end{defn}
 
 Assume there exist an infinite supply of time variables  and let $V=\{x,y,z\dots\}$ be the set of these variables.
 
-\begin{defn}{TPTL Syntax}\label{tptlsyn}
+\begin{defn}[TPTL Syntax]\label{tptlsyn}
   Let $a\in P$ be a propositional variable, $x\in V$ be a time variable and $c\in\mathbb{N}$ a constant.
 
   TPTL terms $\pi$ and formulas $\varphi$ are inductively defined as follows:
@@ -343,52 +372,73 @@ Assume there exist an infinite supply of time variables  and let $V=\{x,y,z\dots
 
 We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 
-\begin{notn}{Abbreviations}\label{tptlabbrev}
+\begin{notn}[Abbreviations]\label{tptlabbrev}
 
   TPTL has the same abbreviations as LTL, plus abbreviations for comparison operations between terms such as $\pi_1 < \pi_2 := \pi_1 \leq \pi_2 \land \neg(\pi_2 \leq \pi_1)$, and so on as expected for $>,\geq,=,\neq$.
 \end{notn}
 
-\begin{defn}{TPTL Semantics}\label{tptlsem}
+\begin{defn}[TPTL Semantics]\label{tptlsem}
 
   Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
   TPTL uses the same semantics as LTL (\Cref{ltlsem}) for those operators which overlap with LTL, except the relation is defined over a time trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{\text{LTL}}\cdots$ with $\rho\vDash_{\text{TPTL},\eval}\cdots$. The remainder of the definition is as follows:
   \begin{align*}
     \rho,\eval &\vDash_{\text{TPTL}}\pi_1\leq\pi_2 \tiff \eval(\pi_1)\leq\eval(\pi_2)\\
-    \rho,\eval &\vDash_{\text{TPTL}} x.\varphi \tiff \rho\vDash_{\text{TPTL},\eval[x:=\tau_0]}\varphi
+    \rho,\eval &\vDash_{\text{TPTL}} x.\varphi \tiff \rho,\eval[x:=\tau_0]\vDash\varphi
   \end{align*}
+  A full definition is given as \Cref{tptlsemfull}
 \end{defn}
 
-\begin{eg}{TPTL examples}
-  TODO
+\begin{eg}[TPTL examples]\label{tptleg}
+  Let $r,y,g\in P$ and \[\varphi = \Box ~x_1.~ (g \to (\neg r ~\U~ x_2.~ (y \land x_2 \leq x_1 + 10) ))\] be a TPTL formula, our traffic light example, but with the added requirement that yellow always occurs within 10 time steps from green.
+
+  The time trace $((1,\{g\}),(2,\{r\}),\dots)$ violates $\varphi$, as does $((1,\{g\}),(12,\{y\}),(15,\{r\}),\dots)$, and also $((1,\{g\}),(2,\{g\}),\dots)$.
+
+  The time trace $((0,\{g\}),(10,\{y\}),(15,\{r\}),(20,\{g\}),(30,\{y\}),(35,\{r\}),\dots)$ satisfies $\varphi$, as does $((100,\{\}),(200,\{\}),\dots)$ (vacuously).
+
 \end{eg}
-% TODO examples of specifications
 
 \subsection{Finite TPTL}
 
 \subsubsection{IE-TPTL} As in IE-LTL, in IE-TPTL we assume that the final state of a trace repeats forever.  I'm not sure if this has been studied before. In \textcite{chai2013rewriting} a runtime verification algorithm for TPTL is introduced, which look like IE-TPTL, but it is not clear if that's what is used.\\
 In IE-TPTL, the only difference from TPTL is the semantics in the final state. The syntax remains the same as in TPTL.
 
-\begin{defn}{IE-TPTL semantics}
+\begin{defn}[IE-TPTL semantics]\label{ietptlsem}
 
-  Let $\rho_f$ be the final state of the time trace. Define the semantic relation $\vDash_{\text{IE-TPTL}}$ of IE-TPTL as follows.Copy the semantics from the TPTL semantics (\Cref{tptlsem}), and add the following to them:
+  Define the semantic relation $\vDash_{\text{IE-TPTL}}$ of IE-TPTL as follows. Copy the semantics from the TPTL semantics (\Cref{tptlsem}), and redefine the `next' $\bigcirc$ and `until' $\U$ operators as follows:
   \begin{align*}
-    \rho_f,\eval &\vDash \bigcirc \varphi \tiff \rho_f \vDash \varphi\\
-    \rho_f,\eval &\vDash \varphi \U \psi \tiff \rho_f \vDash \psi
+    \rho,\eval&\vDash \bigcirc \varphi =
+    \begin{cases}
+      \top &\text{if } \rho^1,\eval \vDash \varphi \tand \rho^1 \ne \epsilon\\
+      \top &\text{if } \rho,\eval\vDash \varphi \tand \rho^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}\\
+    \rho,\eval&\vDash \varphi \U \psi =
+    \begin{cases}
+      \top &\text{if } \rho^i,\eval \vDash \psi \fsome i > 0 \tand \rho^j,\eval \vDash \varphi \fall 0 \leq j < i\\
+      \top &\text{if } \rho,\eval\vDash \psi \tand \rho^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}
   \end{align*}
+  A full definition is given as \Cref{ietptlsemfull}
 \end{defn}
 
 \begin{remk}
-IE-TPTL has some interesting consequences when applied to timed formulae. For example, the formula $\Box x.~ \Diamond y.~ y > x$ is always false, since the time of the final state is repeated forever. I suspect another solution is desirable, such as assuming the time will be increasing forever. It is unclear to me what the most elegant solution is.
+IE-TPTL has some interesting consequences when applied to timed formulae. For example, the formula $\Box x.~ \Diamond y.~ y > x$ is always false, since the time of the final state is repeated forever. I suspect another solution is desirable.
+
+A solution to this problem could be to simplify the formula in the last state to only have time constraints remaining, which can be done since we know that the state will remain the same in an infinite extension. One would then pass the time constraints to a quantifier elimination procedure in order to make a decision.
 \end{remk}
 
-\begin{eg}{TPTL examples}
-  TODO
+\begin{eg}[IE-TPTL examples]\label{ietptleg}
+  Let $r,y,g\in P$ and \[\varphi = \Box ~x_1.~ (g \to (\neg r ~\U~ x_2.~ (y \land x_2 \leq x_1 + 10) ))\] be an IE-TPTL formula, our traffic light example from \Cref{tptleg}.
+
+  The time trace $((1,\{g\}),(2,\{r\}))$ violates $\varphi$, as does $((1,\{g\}),(12,\{y\}),(15,\{r\}))$, and also $((1,\{g\}),(2,\{g\}))$.
+
+  The time trace $((0,\{g\}),(10,\{y\}),(15,\{r\}))$ satisfies $\varphi$, as does $((100,\{\}))$ (vacuously).
 \end{eg}
-% TODO examples of specifications
 
 \subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The broad idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
 
-\begin{defn}{RV-TPTL Syntax}
+\begin{defn}[RV-TPTL Syntax]
 
   Define the formulas of RV-TPTL as:
   \begin{align*}
@@ -396,11 +446,11 @@ IE-TPTL has some interesting consequences when applied to timed formulae. For ex
     \varphi &::= a ~|~ \pi \leq \pi ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \and \varphi ~|~ \sn \varphi ~|~ \wn \varphi ~|~ \varphi \U \varphi ~|~ x. \varphi
   \end{align*}
 \end{defn}
-\begin{notn}{RV-TPTL abbreviations}
+\begin{notn}[RV-TPTL abbreviations]
 
   Take the standard abbreviations for TPTL (\Cref{tptlabbrev}) and add the abbreviations \(\top^P := \neg \bot^P\).% and $\wn \varphi:= \neg \sn \neg \varphi$.
 \end{notn}
-\begin{defn}{RV-TPTL Semantics}\label{rvtptlsem}
+\begin{defn}[RV-TPTL Semantics]\label{rvtptlsem}
 
   I will give the semantics based on TPTL, in a analogous way to how RV-LTL was given.
   Let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times as in TPTL (\Cref{tptlsem}).
@@ -417,8 +467,8 @@ IE-TPTL has some interesting consequences when applied to timed formulae. For ex
 
   Let $\vDash_{FT}$ be defined by taking TPTL semantics and adding:
   \begin{align*}\label{ftsem}
-    \rho,\eval&\vDash_{FT}\sn\varphi \tiff \rho^1,\eval\vDash_{TPTL}\varphi \tand \rho^1,\eval \neq \epsilon\\
-    \rho,\eval&\vDash_{FT}\wn\varphi \tiff \rho^1,\eval\vDash_{TPTL}\varphi \tor \rho^1,\eval = \epsilon
+    \rho,\eval&\vDash_{FT}\sn\varphi \tiff \rho^1,\eval\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
+    \rho,\eval&\vDash_{FT}\wn\varphi \tiff \rho^1,\eval\vDash_{TPTL}\varphi \tor \rho^1 = \epsilon
   \end{align*}
 
   Finally, define $\vDash_{\text{RV-TPTL}}$, the satisfaction relation for RV-TPTL, by the following:
@@ -432,14 +482,20 @@ IE-TPTL has some interesting consequences when applied to timed formulae. For ex
   \]
 \end{defn}
 
-\begin{eg}{RV-TPTL examples}
-  TODO
+\begin{eg}[RV-TPTL examples]
+  Let $r,y,g\in P$ and \[\varphi = \Box ~x_1.~ (g \to (\neg r ~\U~ x_2.~ (y \land x_2 \leq x_1 + 10) ))\] be an IE-TPTL formula, our traffic light example from \Cref{tptleg}.
+
+  The time trace $((1,\{g\}),(2,\{r\}))$ violates $\varphi$,
+  as does $((1,\{g\}),(12,\{y\}),(15,\{r\}))$.
+
+  The time trace $((0,\{g\}),(10,\{y\}),(15,\{r\}))$ presumably satisfies $\varphi$, as does $((100,\{\}))$.
+
+  The time trace $((1,\{g\}),(2,\{g\}))$ presumably violates the trace.
 \end{eg}
-% TODO examples
 
-In my implementation of RV-TPTL, I have made a modified and approximated the semantics. See \Cref{implementaion} for details.
+In my implementation of RV-TPTL, I have made modified and approximated the semantics. See \Cref{implementaion} for details.
 
-\subsubsection{Decision procedure for RV-TPTL}
+\subsubsection{Decision procedure for RV-TPTL} % TODO figure it out
 % \begin{defn}{Generalised RV-TPTL Semantics}
 
 %   Let $f:D\to\{\bot,\top\}$ be a function with a domain $D$. Let $\sigma\in D^+$ be a state sequence of $D$ (rather than $P$, as in previous definition). Then take the semantics of TPTL (\Cref{tptlsem}), and replace the rule for propositional variables (inherited from LTL) with:
@@ -482,14 +538,14 @@ Formula rewriting~\autocite{rosu2005rewriting}, or formula progression, is a tec
 The idea is to simplify the formula using the truth values at the current state, then rewrite the formula using the expansion laws, and finally remove the top level $\bigcirc,\sn,\wn$ operators (except in the final state). The resulting formula is true at the next state iff the original formula was true at the original state in the trace.
 Each state is consumed in the process, and all relevant information from the past is brought forward in the rewritten formula.
 
-\begin{notn}{Rewrites}
+\begin{notn}[Rewrites]
 
   Let $\rw{\text{S},E}$ denote a formula rewriting step under the logical system S with the state $E$. E.g. $\varphi\rw{\text{RV-LTL},E}\psi$ says that the formula $\varphi$ rewrites to $\psi$ under RV-LTL using the state $E$.
 \end{notn}
 
-\begin{eg}{Traffic Lights}
+\begin{eg}[Traffic Lights]
 
-  For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $V=\{r,y,g\}$, $\sigma = (\{g\},\{r\})$ and $\varphi = \Box (g \to (\neg r \U y))$. The trace $\sigma$ should violate the formula. Let $\rw{E}$ stand for $\rw{\text{IE-LTL},E}$ in this example. Here is the progression:
+  For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $P=\{r,y,g\}$, $\sigma = (\{g\},\{r\})$ and $\varphi = \Box (g \to (\neg r \U y))$. The trace $\sigma$ should violate the formula. Let $\rw{E}$ stand for $\rw{\text{IE-LTL},E}$ in this example. Here is the progression:
 \begin{align}
   \Box (g \to (\neg r \U y)) &\rw{\{g\}} \Box (g \to (\neg r \U y)) \land (\neg r \U y)\label{rw1}\\
   &\rw{\{r\}} \bot\label{rw2}
@@ -501,7 +557,7 @@ Then in~\eqref{rw2} the formula is rewritten to false, since the right conjunct 
 
 Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ for the remainder of the section.
 
-\begin{eg}{Apples}
+\begin{eg}[Apples]
 
   For a timed example in RV-TPTL, consider a container of apples which needs to be delivered to a store within a specified time.
   Let $V=\{sent, received\}$,
@@ -559,7 +615,7 @@ Other works on rewriting algorithms that I have read~\autocites{rosu2005rewritin
 
 \subsubsection{IE-TPTL}
 TODO
-\begin{eg}{IE-TPTL verification examples}
+\begin{eg}[IE-TPTL verification examples]
   TODO
 \end{eg}
 % TODO examples
@@ -571,7 +627,7 @@ TODO
 \subsubsection{RV-TPTL}
 My implementation is an approximation of RV-TPTL, since the simplification methods do not detect all tautologies.
 TODO
-\begin{eg}{RV-TPTL verification examples}
+\begin{eg}[RV-TPTL verification examples]
   TODO
 \end{eg}
 % TODO examples
@@ -590,9 +646,9 @@ It would be useful to be able to find the point at which a timed formula (or sub
 
 Another option would be to loop over all times between $\tau_i$ and $\tau_{i+1}$, to find the first possible violation. Similarly these methods could be used if the formula is satisfied, presumably satisfied, presumably violated at $\rho_{i+1}$. This would be useful for both IE-TPTL and RV-TPTL verification to diagnose the exact point at which a decision can be made or changed.
 
-A looping technique could be used at the end of a IE-TPTL trace, so that one could diagnose at what time after the final state might the formula change from one result to another. I ran some simplistic tests of this, but found that I would need to employ a smart searching algorithm to avoid testing a very large number of states.
-
 Peter Baumgartner mentioned a preliminary version of these ideas to me, after reading \textcite{chai2014fivevalued}, which deals with the uncertainty produced by verifying concurrent systems.
+
+A looping technique could be used at the end of a IE-TPTL trace, so that one could diagnose at what time after the final state might the formula change from one result to another. But this performs very badly, as I found out with some simple tests. A better solution would be to simplify the formula at the final state to only contain time constraints, and then pass this to a quantifier elimination procedure to make a decision.
 
 \subsubsection{Loop detection}
 Since the rewriting algorithm uses DNF clauses, it is possible for an infinite loop to occur. It would be useful to be able to detect such a loop using strongly connected component checking. This could be implemented in similar fashion to the work of \textcite{lichtenstein1985checking} concerning model checking. A graph is built using the formula as nodes and the rewrites as edges between the nodes. If there is an infinite loop then there is a strongly connected component in which the loop occurs. One may be able to detect the looping in some cases and terminate the rewriting, making some intelligent decision as to what the result would be.
@@ -616,6 +672,116 @@ I would like to thank Peter Baumgartner for supervising me and Myvanwy Williamso
 \printbibliography{}
 \newpage
 \section{Appendix}\label{appendix}
+\subsection{Full Definitions}\label{fulldef}
+These are expanded definitions which were only partially given in the main text.
+
+\begin{defn}[IE-LTL semantics]\label{ieltlsemfull}
+
+  %Let $\sigma_f$ be the final state of the trace.
+  Define the satisfaction relation for IE-LTL $\vDash_{\text{IE-LTL}}$ as follows.
+  Let $P$ be a set of propositional variables and $\sigma$ a trace.
+  \begin{align*}
+    \sigma &\vDash a \tiff a \in \sigma_0\\
+    \sigma &\nvDash \bot\\
+    \sigma &\vDash \neg \varphi \tiff \sigma \nvDash \varphi\\
+    \sigma &\vDash \varphi \lor \psi \tiff \sigma \vDash \varphi \tor \sigma \vDash \psi\\
+    \sigma &\vDash \varphi \land \psi \tiff \sigma \vDash \varphi \tand \sigma \vDash \psi\\
+    \sigma &\vDash \bigcirc \varphi =
+    \begin{cases}
+      \top &\text{if } \sigma^1 \vDash \varphi \tand \sigma^1 \ne \epsilon\\
+      \top &\text{if } \sigma \vDash \varphi \tand \sigma^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}\\
+    \sigma &\vDash \varphi \U \psi =
+    \begin{cases}
+      \top &\text{if } \sigma^i \vDash \psi \fsome i > 0 \tand \sigma^j \vDash \varphi \fall 0 \leq j < i\\
+      \top &\text{if } \sigma \vDash \psi \tand \sigma^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}
+  \end{align*}
+  Original was \Cref{ieltlsem}
+\end{defn}
+
+\begin{defn}[FLTL semantics]\label{fltlsemfull}
+
+  Define the satisfaction relation for FLTL $\vDash_{\text{FLTL}}$ as follows.
+  \begin{align*}
+    \sigma &\vDash a \tiff a \in \sigma_0\\
+    \sigma &\nvDash \bot\\
+    \sigma &\vDash \neg \varphi \tiff \sigma \nvDash \varphi\\
+    \sigma &\vDash \varphi \lor \psi \tiff \sigma \vDash \varphi \tor \sigma \vDash \psi\\
+    \sigma &\vDash \varphi \land \psi \tiff \sigma \vDash \varphi \tand \sigma \vDash \psi\\
+    \sigma&\vDash\sn\varphi \tiff \sigma^1\vDash\varphi \tand \sigma^1 \neq \epsilon\\
+    \sigma&\vDash\wn\varphi \tiff \sigma^1\vDash\varphi \tor \sigma^1 = \epsilon\\
+    \sigma &\vDash \varphi \U \psi \tiff \sigma^i \vDash \psi \fsome i \geq 0 \tand \sigma^j \vDash \varphi \fall 0 \leq j < i
+  \end{align*}
+  Original was \Cref{fltlsem}
+\end{defn}
+% \begin{defn}{\ltlt\ semantics}\label{ltltsemfull}
+
+%   The notation $\sigma\gamma$ refers to the concatenation of the infinite trace $\gamma$ to the finite trace $\sigma$.
+%   Define the satisfaction relation for \ltlt $\vDash_{\text{\ltlt}}$ as follows.
+%   \[\sigma\vDash_{\text{\ltlt}}\varphi =
+%     \begin{cases}
+%       \top & \text{if } \sigma\gamma \vDash{\text{LTL}} \varphi \fall \gamma \in P^+\\
+%       \bot & \text{if } \sigma\gamma \vDash{\text{LTL}} \varphi \fall \gamma \in P^+\\
+%       ? & \text{otherwise}
+%     \end{cases}
+%     \]
+%   Original was \Cref{ltltsem}.
+% \end{defn}
+
+\begin{defn}[TPTL Semantics]\label{tptlsemfull}
+
+  Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
+
+  \begin{align*}
+    \rho,\eval&\vDash a \tiff a \in \rho_0\\
+    \rho,\eval&\nvDash \bot\\
+    \rho,\eval&\vDash \neg \varphi \tiff \rho,\eval \nvDash \varphi\\
+    \rho,\eval&\vDash \varphi \lor \psi \tiff \rho,\eval \vDash \varphi \tor \rho,\eval \vDash \psi\\
+    \rho,\eval&\vDash \varphi \land \psi \tiff \rho,\eval \vDash \varphi \tand \rho,\eval \vDash \psi\\
+    \rho,\eval&\vDash \bigcirc \varphi \tiff \rho^1 \vDash \varphi\\
+    \rho,\eval&\vDash \varphi \U \psi \tiff \rho^i,\eval \vDash \psi \fsome i \geq 0 \tand \rho^j,\eval \vDash \varphi \fall 0 \leq j < i
+    \rho,\eval &\vDash_{\text{TPTL}}\pi_1\leq\pi_2 \tiff \eval(\pi_1)\leq\eval(\pi_2)\\
+    \rho,\eval &\vDash_{\text{TPTL}} x.\varphi \tiff \rho,\eval[x:=\tau_0]\vDash\varphi
+  \end{align*}
+  Original was \Cref{tptlsem}
+\end{defn}
+
+\begin{defn}[IE-TPTL semantics]\label{ietptlsemfull}
+
+  Define the semantic relation $\vDash_{\text{IE-TPTL}}$ of IE-TPTL as follows. Copy the semantics from the TPTL semantics (\Cref{tptlsem}), and redefine the `next' $\bigcirc$ and `until' $\U$ operators as follows:
+  \begin{align*}
+    \rho,\eval&\vDash a \tiff a \in \rho_0\\
+    \rho,\eval &\vDash \pi_1\leq\pi_2 \tiff \eval(\pi_1)\leq\eval(\pi_2)\\
+    \rho,\eval&\nvDash \bot\\
+    \rho,\eval&\vDash \neg \varphi \tiff \rho,\eval \nvDash \varphi\\
+    \rho,\eval&\vDash \varphi \lor \psi \tiff \rho,\eval \vDash \varphi \tor \rho,\eval \vDash \psi\\
+    \rho,\eval&\vDash \varphi \land \psi \tiff \rho,\eval \vDash \varphi \tand \rho,\eval \vDash \psi\\
+    \rho,\eval&\vDash \bigcirc \varphi =
+    \begin{cases}
+      \top &\text{if } \rho^1,\eval \vDash \varphi \tand \rho^1 \ne \epsilon\\
+      \top &\text{if } \rho,\eval\vDash \varphi \tand \rho^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}\\
+    \rho,\eval&\vDash \varphi \U \psi =
+    \begin{cases}
+      \top &\text{if } \rho^i,\eval \vDash \psi \fsome i > 0 \tand \rho^j,\eval \vDash \varphi \fall 0 \leq j < i\\
+      \top &\text{if } \rho,\eval\vDash \psi \tand \rho^1 = \epsilon\\
+      \bot &\text{otherwise}
+    \end{cases}\\
+    \rho,\eval &\vDash x.\varphi \tiff \rho,\eval[x:=\tau_0]\vDash\varphi
+      \end{align*}
+  Original was \Cref{ietptlsem}
+\end{defn}
+
+
+
+% \newpage
+% \subsection{List of Definitions}
+% \listoftheorems[ignoreall,show={defn}]
+\newpage
 \subsection{Authorship Declarations}
 The formula rewriting functions in the \texttt{progress} object were originally written by my supervisor Peter Baumgartner as a formula progression calculator for another project. I have modified them to suit my project, but they are substantially similar. There were other functions in \texttt{progress} which I removed.
 
