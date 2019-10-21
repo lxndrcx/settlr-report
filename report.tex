@@ -344,7 +344,7 @@ Let $r,y,g\in P$ and $\varphi = \Box (g \to (\neg r \U y))$ be an RV-LTL formula
 \subsection{Timed Propositional Temporal Logic}
 Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extension of LTL to encode explicit time into the logic.
 In LTL, only the order of states is reasoned about, i.e., $\sigma_i$ is before $\sigma_{i+1}$, but for many verification problems it can be useful to reason about the explicit time at which a state occurs, i.e., $\sigma_i$ is 3 time units earlier than $\sigma_{i+1}$.
-For this we define a time trace which contains the sequence of times corresponding to the sequence of states.
+For this we define a timed trace which contains the sequence of times corresponding to the sequence of states.
 A quantifier called a \emph{freeze operator} is added to the logic, which binds occurrences of a variable to the time at which the operator is evaluated.
 Integer comparison is added to the logic, to allow for specifications such as: ``If $p$ becomes true, $q$ will become true within 5 time units''.
 
@@ -379,8 +379,8 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 
 \begin{defn}[TPTL Semantics]\label{tptlsem}
 
-  Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
-  TPTL uses the same semantics as LTL (\Cref{ltlsem}) for those operators which overlap with LTL, except the relation is defined over a time trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{\text{LTL}}\cdots$ with $\rho\vDash_{\text{TPTL},\eval}\cdots$. The remainder of the definition is as follows:
+  Let $\rho = (\sigma,\tau)$ be a timed trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
+  TPTL uses the same semantics as LTL (\Cref{ltlsem}) for those operators which overlap with LTL, except the relation is defined over a timed trace rather than a standard trace. For those cases, substitute occurrences of $\sigma\vDash_{\text{LTL}}\cdots$ with $\rho\vDash_{\text{TPTL},\eval}\cdots$. The remainder of the definition is as follows:
   \begin{align*}
     \rho,\eval &\vDash_{\text{TPTL}}\pi_1\leq\pi_2 \tiff \eval(\pi_1)\leq\eval(\pi_2)\\
     \rho,\eval &\vDash_{\text{TPTL}} x.\varphi \tiff \rho,\eval[x:=\tau_0]\vDash\varphi
@@ -391,9 +391,9 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 \begin{eg}[TPTL examples]\label{tptleg}
   Let $r,y,g\in P$ and \[\varphi = \Box ~x_1.~ (g \to (\neg r ~\U~ x_2.~ (y \land x_2 \leq x_1 + 10) ))\] be a TPTL formula, our traffic light example, but with the added requirement that yellow always occurs within 10 time steps from green.
 
-  The time trace $((1,\{g\}),(2,\{r\}),\dots)$ violates $\varphi$, as does $((1,\{g\}),(12,\{y\}),(15,\{r\}),\dots)$, and also $((1,\{g\}),(2,\{g\}),\dots)$.
+  The timed trace $((1,\{g\}),(2,\{r\}),\dots)$ violates $\varphi$, as does $((1,\{g\}),(12,\{y\}),(15,\{r\}),\dots)$, and also $((1,\{g\}),(2,\{g\}),\dots)$.
 
-  The time trace $((0,\{g\}),(10,\{y\}),(15,\{r\}),(20,\{g\}),(30,\{y\}),(35,\{r\}),\dots)$ satisfies $\varphi$, as does $((100,\{\}),(200,\{\}),\dots)$ (vacuously).
+  The timed trace $((0,\{g\}),(10,\{y\}),(15,\{r\}),(20,\{g\}),(30,\{y\}),(35,\{r\}),\dots)$ satisfies $\varphi$, as does $((100,\{\}),(200,\{\}),\dots)$ (vacuously).
 
 \end{eg}
 
@@ -431,9 +431,9 @@ A solution to this problem could be to simplify the formula in the last state to
 \begin{eg}[IE-TPTL examples]\label{ietptleg}
   Let $r,y,g\in P$ and \[\varphi = \Box ~x_1.~ (g \to (\neg r ~\U~ x_2.~ (y \land x_2 \leq x_1 + 10) ))\] be an IE-TPTL formula, our traffic light example from \Cref{tptleg}.
 
-  The time trace $((1,\{g\}),(2,\{r\}))$ violates $\varphi$, as does $((1,\{g\}),(12,\{y\}),(15,\{r\}))$, and also $((1,\{g\}),(2,\{g\}))$.
+  The timed trace $((1,\{g\}),(2,\{r\}))$ violates $\varphi$, as does $((1,\{g\}),(12,\{y\}),(15,\{r\}))$, and also $((1,\{g\}),(2,\{g\}))$.
 
-  The time trace $((0,\{g\}),(10,\{y\}),(15,\{r\}))$ satisfies $\varphi$, as does $((100,\{\}))$ (vacuously).
+  The timed trace $((0,\{g\}),(10,\{y\}),(15,\{r\}))$ satisfies $\varphi$, as does $((100,\{\}))$ (vacuously).
 \end{eg}
 
 \subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The broad idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
@@ -454,7 +454,7 @@ A solution to this problem could be to simplify the formula in the last state to
 
   I will give the semantics based on TPTL, in a analogous way to how RV-LTL was given.
   Let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times as in TPTL (\Cref{tptlsem}).
-  The notation $\rho\omega$ refers to the concatenation of the infinite time trace $\omega$ to the finite time trace $\rho$.
+  The notation $\rho\omega$ refers to the concatenation of the infinite timed trace $\omega$ to the finite timed trace $\rho$.
   I will define two semantic relations in order to then define the RV-TPTL semantics. These are essentially TPTL$_3$ and FTPTL respectively.
 
   Let $\vDash_{T3}$ be given by:
@@ -485,17 +485,16 @@ A solution to this problem could be to simplify the formula in the last state to
 \begin{eg}[RV-TPTL examples]
   Let $r,y,g\in P$ and \[\varphi = \Box ~x_1.~ (g \to (\neg r ~\U~ x_2.~ (y \land x_2 \leq x_1 + 10) ))\] be an IE-TPTL formula, our traffic light example from \Cref{tptleg}.
 
-  The time trace $((1,\{g\}),(2,\{r\}))$ violates $\varphi$,
+  The timed trace $((1,\{g\}),(2,\{r\}))$ violates $\varphi$,
   as does $((1,\{g\}),(12,\{y\}),(15,\{r\}))$.
 
-  The time trace $((0,\{g\}),(10,\{y\}),(15,\{r\}))$ presumably satisfies $\varphi$, as does $((100,\{\}))$.
+  The timed trace $((0,\{g\}),(10,\{y\}),(15,\{r\}))$ presumably satisfies $\varphi$, as does $((100,\{\}))$.
 
-  The time trace $((1,\{g\}),(2,\{g\}))$ presumably violates the trace.
+  The timed trace $((1,\{g\}),(2,\{g\}))$ presumably violates the trace.
 \end{eg}
 
 In my implementation of RV-TPTL, I have made modified and approximated the semantics. See \Cref{implementaion} for details.
 
-\subsubsection{Decision procedure for RV-TPTL} % TODO figure it out
 % \begin{defn}{Generalised RV-TPTL Semantics}
 
 %   Let $f:D\to\{\bot,\top\}$ be a function with a domain $D$. Let $\sigma\in D^+$ be a state sequence of $D$ (rather than $P$, as in previous definition). Then take the semantics of TPTL (\Cref{tptlsem}), and replace the rule for propositional variables (inherited from LTL) with:
@@ -535,8 +534,10 @@ In my implementation of RV-TPTL, I have made modified and approximated the seman
 \section{Runtime Verification using Formula Rewriting}
 \subsection{Formula Rewriting}
 Formula rewriting~\autocite{rosu2005rewriting}, or formula progression, is a technique used in runtime verification.
-The idea is to simplify the formula using the truth values at the current state, then rewrite the formula using the expansion laws, and finally remove the top level $\bigcirc,\sn,\wn$ operators (except in the final state). The resulting formula is true at the next state iff the original formula was true at the original state in the trace.
+The idea is to simplify the formula using the truth values at the current state, then rewrite the formula using the expansion laws, and finally remove the top level `next' ($\bigcirc,\sn,\wn$) operators (except in the final state). This is also referred to as progression, the formula has been progressed. The resulting formula is true at the next state iff the original formula was true at the original state in the trace.
 Each state is consumed in the process, and all relevant information from the past is brought forward in the rewritten formula.
+
+In the final state, the formula may be rewritten with expansion laws and simplified based on the state, but one might not want to fully progress the formula, as is the case in RV-TPTL, FLTL and RV-LTL, where the semantics require that the `next' operators are not stripped as they were for the non-final states. For IE-LTL and IE-TPTL, the `next' operators are stripped in any case, so the final state distinction is not as important.
 
 \begin{notn}[Rewrites]
 
@@ -545,7 +546,7 @@ Each state is consumed in the process, and all relevant information from the pas
 
 \begin{eg}[Traffic Lights]
 
-  For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $P=\{r,y,g\}$, $\sigma = (\{g\},\{r\})$ and $\varphi = \Box (g \to (\neg r \U y))$. The trace $\sigma$ should violate the formula. Let $\rw{E}$ stand for $\rw{\text{IE-LTL},E}$ in this example. Here is the progression:
+  For a simple example, consider the LTL traffic light example from \textcite[175]{rosu2005rewriting}, with $P=\{r,y,g\}$, $\sigma = (\{g\},\{r\},\dots)$ and $\varphi = \Box (g \to (\neg r \U y))$. The trace $\sigma$ should violate the formula. Let $\rw{E}$ stand for $\rw{\text{IE-LTL},E}$ in this example. Here is the progression:
 \begin{align}
   \Box (g \to (\neg r \U y)) &\rw{\{g\}} \Box (g \to (\neg r \U y)) \land (\neg r \U y)\label{rw1}\\
   &\rw{\{r\}} \bot\label{rw2}
@@ -556,6 +557,29 @@ Then in~\eqref{rw2} the formula is rewritten to false, since the right conjunct 
 \end{eg}
 
 Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ for the remainder of the section.
+
+
+\subsubsection{Decision procedure for RV-TPTL}
+In order to decide if a trace satisfies or violates a formula in RV-TPTL, the following procedure can be used.
+
+\begin{defn}[RV-TPTL decision procedure]\label{decision}
+  Let $\rho=(\rho_0,\rho_1,\dots,\rho_n)$ be a timed trace and $\varphi$ a RV-TPTL formula.
+
+  Then let $\psi$ be the result of rewriting $\varphi$ $n$ times, corresponding to the first $n$ states of $\rho$, and let $\eval^{n-1}$ be the resulting time evaluation.
+
+  Now rewrite $\psi$ using $\rho_n$, but do not remove the `next' operators i.e., do not progress the formula, only expand and simplify.
+  Simplification will decide any non-`next' formulae, such that the resulting formula consists of conjunctions and/or disjunctions of `next' formulae e.g., $\sn p \land \wn q \lor \sn r$ is in the described form. Let $\phi$ be the resulting formula and $\eval^n$ be the resulting time evaluation.
+
+  Then there are three cases to check in order to make a decision.
+
+  First, we check if $\neg\phi$ is satisfiable, which can be checked efficiently using a tableau method such as in \textcite{alur1994really}. If $\neg\phi$ is unsatisfiable, then $\phi$ is valid and we have that $\rho_n\omega, \eval^n \vDash \phi$ for all $\omega\in (P^+,\mathbb{N}^+)$, and therefore $\rho,\eval^n \vDash \varphi$ and the decision procedure terminates.
+
+  Secondly, if $\neg\phi$ was satisfiable, now check if $\phi$ is satisfiable using the same tableau method. If $\phi$ is unsatisfiable then we know that $\rho_n\omega, \eval^n \nvDash \phi$ for all $\omega\in (P^+,\mathbb{N}^+)$, and therefore $\rho,\eval^n \nvDash \varphi$ and the decision procedure terminates.
+
+  Finally, if $\phi$ is satisfiable, then transform all $\sn$ formulae into $\bot^P$ and all $\wn$ formulae into $\top^P$. Then evaluate the formula based on $\lor$ being the least upper bound and $\land$ being the greatest lower bound, using the ordering $\top \geq \top^P \geq \bot^P \geq \bot$. The resulting formula is the result of the decision procedure.
+\end{defn}
+
+My implementation is only an approximation of the above decision procedure.
 
 \begin{eg}[Apples]
 
@@ -733,7 +757,7 @@ These are expanded definitions which were only partially given in the main text.
 
 \begin{defn}[TPTL Semantics]\label{tptlsemfull}
 
-  Let $\rho = (\sigma,\tau)$ be a time trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
+  Let $\rho = (\sigma,\tau)$ be a timed trace, $x\in V$, $c\in\mathbb{N}$, and let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times, with $\eval(x + c) = \eval(x) + c$, $\eval(c) = c$ and $\eval[x:=c]$ denoting the evaluation which agrees with $\eval$ for $V\setminus\{x\}$ and maps $x$ to $c$.
 
   \begin{align*}
     \rho,\eval&\vDash a \tiff a \in \rho_0\\
