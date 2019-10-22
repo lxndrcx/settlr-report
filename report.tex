@@ -31,6 +31,7 @@
 \declaretheorem[sibling=thm,name=Lemma]{lem}
 \declaretheorem[sibling=thm,name=Corollary]{corl}
 \declaretheorem[sibling=thm,style=definition,name=Definition]{defn}
+\declaretheorem[sibling=thm,style=definition,name={Decision Procedure}]{desc}
 \declaretheorem[sibling=thm,style=remark,name=Notation]{notn}
 \declaretheorem[sibling=thm,style=remark,name=Remark]{remk}
 \declaretheorem[sibling=thm,style=remark,name=Example]{eg}
@@ -40,6 +41,7 @@
 \surroundwithmdframed{lem}
 \surroundwithmdframed{corl}
 \surroundwithmdframed{defn}
+\surroundwithmdframed{desc}
 \surroundwithmdframed{eg}
 \surroundwithmdframed{remk}
 \surroundwithmdframed{notn}
@@ -47,6 +49,7 @@
 \setcounter{secnumdepth}{2}
 % \usepackage{alltt}
 \usepackage{listings}
+\usepackage{alltt}
 \usepackage{hyperref}
 
 \newcommand{\U}{\mathsf{U}}
@@ -61,7 +64,7 @@
 \newcommand{\ltlt}{LTL$_3$}
 \newcommand{\rw}[1]{\Rightarrow_{#1}}
 \begin{document}
-\lstset{language=Scala,basicstyle=\ttfamily\small,showstringspaces=false,frame=tl,framerule=1pt,float=tbh,captionpos=b}
+\lstset{language=Scala,basicstyle=\ttfamily\small,showstringspaces=false,frame=tl,framerule=1pt,captionpos=b}
 \maketitle
 
 \begin{abstract} % TODO
@@ -121,7 +124,7 @@ The formulae of LTL are interpreted over sequences of states called traces.
 
 \begin{defn}[Traces and states]
 
-  Let $P$ be a set of propositional variables. A \emph{state} $\sigma_i \subseteq P$ is a set of propositional variables which are interpreted as true. A \emph{trace} $\sigma \in P^+$ is an infinite sequence of states.
+  Let $P$ be a set of propositional variables. A \emph{state} $\sigma_i \subseteq P$ is a set of propositional variables that are interpreted as true. A \emph{trace} $\sigma \in P^+$ is an infinite sequence of states.
 \end{defn}
 
 \begin{notn}[Satisfaction Relations]
@@ -279,7 +282,7 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 \end{defn}
 \begin{defn}[\ltlt\ semantics]\label{ltltsem}
 
-  The semantics for \ltlt\ are defined by cases relying on standard LTL semantics. The notation $\sigma\gamma$ refers to the concatenation of the infinite trace $\gamma$ to the finite trace $\sigma$.
+  The semantics for \ltlt\ is defined by cases relying on standard LTL semantics. The notation $\sigma\gamma$ refers to the concatenation of the infinite trace $\gamma$ to the finite trace $\sigma$.
   Define the satisfaction relation for \ltlt $\vDash_{\text{\ltlt}}$ as follows.
   \[\sigma\vDash_{\text{\ltlt}}\varphi =
     \begin{cases}
@@ -344,7 +347,7 @@ Let $r,y,g\in P$ and $\varphi = \Box (g \to (\neg r \U y))$ be an RV-LTL formula
 \subsection{Timed Propositional Temporal Logic}
 Timed Propositional Temporal Logic (TPTL)\autocite{alur1994really} is an extension of LTL to encode explicit time into the logic.
 In LTL, only the order of states is reasoned about, i.e., $\sigma_i$ is before $\sigma_{i+1}$, but for many verification problems it can be useful to reason about the explicit time at which a state occurs, i.e., $\sigma_i$ is 3 time units earlier than $\sigma_{i+1}$.
-For this we define a timed trace which contains the sequence of times corresponding to the sequence of states.
+For this, we define a timed trace that contains the sequence of times corresponding to the sequence of states.
 A quantifier called a \emph{freeze operator} is added to the logic, which binds occurrences of a variable to the time at which the operator is evaluated.
 Integer comparison is added to the logic, to allow for specifications such as: ``If $p$ becomes true, $q$ will become true within 5 time units''.
 
@@ -452,7 +455,7 @@ A solution to this problem could be to simplify the formula in the last state to
 \end{notn}
 \begin{defn}[RV-TPTL Semantics]\label{rvtptlsem}
 
-  I will give the semantics based on TPTL, in a analogous way to how RV-LTL was given.
+  I will give the semantics based on TPTL, in an analogous way to how RV-LTL was given.
   Let $\eval:V\to\mathbb{N}$ be an (initially empty) evaluation of time variables to times as in TPTL (\Cref{tptlsem}).
   The notation $\rho\omega$ refers to the concatenation of the infinite timed trace $\omega$ to the finite timed trace $\rho$.
   I will define two semantic relations in order to then define the RV-TPTL semantics. These are essentially TPTL$_3$ and FTPTL respectively.
@@ -562,7 +565,7 @@ Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ for the remainder of the section.
 \subsubsection{Decision procedure for RV-TPTL}
 In order to decide if a trace satisfies or violates a formula in RV-TPTL, the following procedure can be used.
 
-\begin{defn}[RV-TPTL decision procedure]\label{decision}
+\begin{desc}[RV-TPTL]\label{decision}
   Let $\rho=(\rho_0,\rho_1,\dots,\rho_n)$ be a timed trace and $\varphi$ a RV-TPTL formula.
 
   Then let $\psi$ be the result of rewriting $\varphi$ $n$ times, corresponding to the first $n$ states of $\rho$, and let $\eval^{n-1}$ be the resulting time evaluation.
@@ -577,7 +580,7 @@ In order to decide if a trace satisfies or violates a formula in RV-TPTL, the fo
   Secondly, if $\neg\phi$ was satisfiable, now check if $\phi$ is satisfiable using the same tableau method. If $\phi$ is unsatisfiable then we know that $\rho_n\omega, \eval^n \nvDash \phi$ for all $\omega\in (P^+,\mathbb{N}^+)$, and therefore $\rho,\eval^n \nvDash \varphi$ and the decision procedure terminates.
 
   Finally, if $\phi$ is satisfiable, then transform all $\sn$ formulae into $\bot^P$ and all $\wn$ formulae into $\top^P$. Then evaluate the formula based on $\lor$ being the least upper bound and $\land$ being the greatest lower bound, using the ordering $\top \geq \top^P \geq \bot^P \geq \bot$. The resulting formula is the result of the decision procedure.
-\end{defn}
+\end{desc}
 
 My implementation is only an approximation of the above decision procedure.
 
@@ -609,7 +612,7 @@ My implementation is only an approximation of the above decision procedure.
 
   Thus the formula $\varphi$ presumably satisfies the trace $\rho$.
   Adding a finite suffix could change that result, namely if you have a trace where $sent$ is never followed by $received$.
-  In this case you would get the result $\bot^P$ instead.
+  In this case you, would get the result $\bot^P$ instead.
 
   Note that this formula is only ever satisfied or violated by infinite traces, which is why the uncertainty given by RV-TPTL is plausibly desirable given a finite trace.
 \end{eg}
@@ -619,23 +622,121 @@ My implementation is only an approximation of the above decision procedure.
 % \end{remk}
 
 \subsection{Related Work}
-Formula rewriting was devised for LTL in \textcite{rosu2005rewriting}, as part of the Java PathExplorer project, and has been used in some NASA programs. The technique was revised for TPTL in \textcite{chai2013rewriting}, with a case study of its potential for use in a train control system. In both of these works, a separate rewrite engine called Maude~\autocite{clavel2002maude} was used. In the next section I discuss the implementation of my rewrite based verification tool, which does not use Maude.
+Formula rewriting was devised for LTL in \textcite{rosu2005rewriting}, as part of the Java PathExplorer project, and has been used in some NASA programs. The technique was revised for TPTL in \textcite{chai2013rewriting}, with a case study of its potential for use in a train control system. In both of these works, a separate rewrite engine called Maude~\autocite{clavel2002maude} was used. In the next section, I discuss the implementation of my rewrite based verification tool, which does not use Maude.
 
 \section{Implementation in Scala}\label{implementaion}
 I have implemented a runtime verifier in the Scala programming language.
 It is embedded into Scala as an internal Domain Specific Language (DSL), this is also known as a shallow embedding.
 I allow the user to choose a logic, either RV-TPTL or IE-TPTL.
-My verifier is structured as a library which can be integrated into other Scala programs.
+My verifier is structured as a library that can be integrated into other Scala programs.
+I will describe the interesting aspects of my implementation, but it is also available in the repository \url{TODO} % TODO link repo
+in case you wish the see the full source or run it. I have tried to present the implementation without getting bogged down in details, so I have simplified the code listings to be more readable where possible.
 
 \subsection{Shallow Embedding}
-When implementing a Domain Specific Language, it is possible to write an internal or external DSL, also known as shallow or deep embedded DSLs respectively. In a deep embedding, the implementer is required to create a parser which translates the DSL into another another form for evaluation. In a shallow embedding, the DSL takes form within the parent language, delegating the parsing to the parser of the language, which has already been written and tested. The terms of the DSL become types within the parent language and then the implementer can use the libraries and infrastructure provided by for that language~
+When implementing a Domain Specific Language, it is possible to write an internal or external DSL, also known as shallow or deep embedded DSLs respectively. In a deep embedding, the implementer is required to create a parser that translates the DSL into another another form for evaluation. In a shallow embedding, the DSL takes form within the parent language, delegating the parsing to the parser of the language, which has already been written and tested. The terms of the DSL become types within the parent language and then the implementer can use the libraries and infrastructure provided for that language~
 \autocite{gibbons2014foldingdeepshallow}.
 
-In the case of this project, I have written a shallow embedding of IE-TPTL and RV-TPTL in the programming language Scala~\autocite{Odersky04scala}. I was partly inspired by some of the syntax examples in \textcite{barringer2011tracecontract}. Using Scala classes, methods, and implicits I have constructed a convenient DSL for specifying temporal properties.
+In the case of this project, I have written a shallow embedding of IE-TPTL and RV-TPTL in the programming language Scala~\autocite{Odersky04scala}.
+I was partly inspired by some of the syntax examples in \textcite{barringer2011tracecontract}.
+Using Scala classes, methods, and implicits I have constructed a convenient DSL for specifying temporal properties.
+
+For example, to write the formula $\Box x. (a \to \Diamond y. (b \land (y \leq x + 2)))$ using my DSL, I can write \lstinline{G ('x ~ (a -> F ('y ~ (b /\ ('y <= 'x + 2)))))}.
+
+The language is mostly defined using methods of the abstract class \lstinline{Formula}. Listing \ref{lstbasic} shows the definitions for LTL fragment:
+\begin{lstlisting}[caption={Basic DSL Functions},label=lstbasic]
+abstract class Formula {
+  ...
+  def /\(f:Formula) = And(this,f)
+  def \/(f:Formula) = Or(this,f)
+  def ->(f:Formula) = Or(this.compl,f)
+  def unary_!() = Neg(this)
+  def U(f:Formula) = Until(this,f)
+}
+
+object Formula {
+  def X(f:Formula) = Next(f)
+  def N(f:Formula) = WeakNext(f)
+  def F(f:Formula) = Future(f)
+  def G(f:Formula) = Globally(f)
+  ...
+}
+\end{lstlisting}
+Formula are represented as case classes and objects in Scala, for example $\land$ is defined as:
+\begin{lstlisting}
+case class And(f1: Formula, f2: Formula) extends BinOp("∧") {...}
+\end{lstlisting}
+These case classes and objects all inherit from the abstract classes \lstinline{Formula}, either directly or via another abstract class such as \lstinline{BinOp} which represents binary operators.
+
+Importantly, I implemented atoms as functions rather than propositional variables:
+\begin{lstlisting}
+case class Atom[A](name: String, interpretation: A => Boolean) extends Formula
+...
+  def apply[A](state: (Int,A)): Formula = this match {
+      if (fun(state._2)) True
+      else False
+  }
+\end{lstlisting}
+
+The \texttt{apply} function takes a timed state and simplifies based on that interpretation. \texttt{Atom} has an interpretation method which takes any type as input (e.g., a String, a List, etc) and outputs a boolean, and the apply function maps that boolean to \texttt{True} or \texttt{False}, which are \texttt{Const} objects in my logic, not the Scala booleans \texttt{true} and \texttt{false}.
+\begin{lstlisting}
+abstract class Const(name: String, n: Int) extends Formula with Ordered[Const] {...}
+case object False extends Const("⊥",0)
+case object PFalse extends Const("⊥ᴾ",1)
+case object PTrue extends Const("⊤ᴾ",2)
+case object True extends Const("⊤",3)
+\end{lstlisting}
+
+Time terms and formulae are brought into the language using implicit classes and methods:
+\begin{lstlisting}
+  implicit def TimeVarSymbolNoOffset(x: Symbol) = TimeVar(x,0)
+  implicit class TimeVarSymbol(x: Symbol) {
+    def ~(f: Formula) = Freeze(x,f) // e.g. 'x ~ (a /\ b) is a Formula
+    def +(t: Int) = TimeVar(x,t) // e.g. 'x + 15 is a TimeTerm
+    def <=(t2: TimeTerm) = LTEQ(TimeVar(x,0),t2)
+    def ~=(t2: TimeTerm) = LTEQ(TimeVar(x,0),t2) /\ LTEQ(t2,TimeVar(x,0))
+    def <(t2: TimeTerm) = LTEQ(TimeVar(x,0),t2) /\ !LTEQ(t2,TimeVar(x,0))
+    def >(t2: TimeTerm) = !LTEQ(TimeVar(x,0),t2)
+    def >=(t2: TimeTerm) = LTEQ(t2,TimeVar(x,0))
+  }
+\end{lstlisting}
+These are considered advanced features of Scala, and I did have some trouble understanding them at first. These methods allow me to convert other types into formulae and terms implicitly i.e., I can just write \lstinline{'x + 2} and the compiler will look for a \texttt{+} method for Symbol, which doesn't exist, and then look for a matching implicit, in this case evaluating to a \lstinline{TimeVar('x,2)}.
+
+The time terms and formulae are represented again as classes such as \lstinline{LTEQ} for the less than or equal to ($\leq$) operator and \lstinline{Freeze} for the freeze ($x.$) quantifier:
+\begin{lstlisting}
+case class Freeze(x: Symbol, f: Formula) extends Formula {...}
+case class LTEQ(t1: TimeTerm, t2: TimeTerm) extends Formula {...}
+\end{lstlisting}
+
+% Formulas are represented as a class structure, as shown in Listing \ref{lstclasses}.
+
+% \begin{lstlisting}[caption={Class Structure},label=lstclasses]
+% sealed abstract class Formula {...}
+% case class Atom[A](name: String, interpretation: A => Boolean) extends Formula {...}
+% sealed abstract class Const(name: String, n: Int) extends Formula with Ordered[Const] {...}
+% sealed abstract class UnOp(opName: String) extends Formula {...}
+% sealed abstract class BinOp(opName: String) extends Formula {...}
+% case class Neg(f: Formula) extends UnOp("¬") {...}
+% sealed trait temporalUnOp {...}
+% case class Next(f: Formula) extends UnOp("○ˢ") with temporalUnOp {...}
+% case class WeakNext(f: Formula) extends UnOp("○ᵂ") with temporalUnOp {...}
+% case class Future(f: Formula) extends UnOp("◇") with temporalUnOp {...}
+% case class Globally(f: Formula) extends UnOp("☐") with temporalUnOp {...}
+% case class And(f1: Formula, f2: Formula) extends BinOp("∧") {...}
+% case class Or(f1: Formula, f2: Formula) extends BinOp("∨") {...}
+% case class Until(f1: Formula, f2: Formula) extends BinOp("U") {...}
+% case class Freeze(x: Symbol, f: Formula) extends Formula {...}
+% sealed abstract class TimeTerm {...}
+% case class Time(c: Int) extends TimeTerm {...}
+% case class TimeVar(x: Symbol, c: Int) extends TimeTerm {...}
+% case class LTEQ(t1: TimeTerm, t2: TimeTerm) extends Formula {...}
+% \end{lstlisting}
+
 \subsection{Runtime Verification}
 \subsubsection{Formula Rewriting}
 I have implemented a runtime verifier on top of the shallow embedded DSL for timed temporal logic. It uses a formula rewriting algorithm.
-Other works on rewriting algorithms that I have read~\autocites{rosu2005rewriting,chai2013rewriting} used the rewriting engine Maude~\autocite{clavel2002maude} to perform their rewrites. This is not my approach.
+Other works on rewriting algorithms that I have read~\autocites{rosu2005rewriting,chai2013rewriting} used the rewriting engine Maude~\autocite{clavel2002maude} to perform their rewrites. This was not my approach.
+
+Instead, I was given access to a `progression calculator' for LTL that my supervisor had written previously. Using this as a base, I implemented my DSL to work with the provided progression functions which I then adapted to my project. The progression functions (\texttt{expand} and \texttt{unX})
 
 \subsubsection{IE-TPTL}
 TODO
@@ -666,19 +767,19 @@ TODO talk about simplification and its impact on performance.
 \subsection{Future Work}
 
 \subsubsection{Finding Changes in Results}
-It would be useful to be able to find the point at which a timed formula (or subformula) changes from one result to another. For example, suppose there is a timed formula and a trace $\rho$, with a time constraint which is not violated at $\rho_i$, but is violated at $\rho_{i+1}$. Also let there be a time gap of at least 1, i.e., $\tau_i < \tau_{i+1} - 1$. Then it would be useful to diagnose where in that gap the time constraint is violated. One way to do this would be for the user to select some intermediate times to test, by giving a time $\tau_j$ with $\tau_i < \tau_j < \tau_{i+1}$. The verifier could test different states $\sigma_j$ and see where the violation occurs. Possible sensible imputations could be $\sigma_j := \sigma_i$ or $\sigma_j := \sigma_{i+1}$.
+It would be useful to be able to find the point at which a timed formula (or subformula) changes from one result to another. For example, suppose there is a timed formula and a trace $\rho$, with a time constraint that is not violated at $\rho_i$, but is violated at $\rho_{i+1}$. Also, let there be a time gap of at least 1, i.e., $\tau_i < \tau_{i+1} - 1$. Then it would be useful to diagnose where in that gap the time constraint is violated. One way to do this would be for the user to select some intermediate times to test, by giving a time $\tau_j$ with $\tau_i < \tau_j < \tau_{i+1}$. The verifier could test different states $\sigma_j$ and see where the violation occurs. Possible sensible imputations could be $\sigma_j := \sigma_i$ or $\sigma_j := \sigma_{i+1}$.
 
-Another option would be to loop over all times between $\tau_i$ and $\tau_{i+1}$, to find the first possible violation. Similarly these methods could be used if the formula is satisfied, presumably satisfied, presumably violated at $\rho_{i+1}$. This would be useful for both IE-TPTL and RV-TPTL verification to diagnose the exact point at which a decision can be made or changed.
+Another option would be to loop over all times between $\tau_i$ and $\tau_{i+1}$, to find the first possible violation. Similarly, these methods could be used if the formula is satisfied, presumably satisfied, presumably violated at $\rho_{i+1}$. This would be useful for both IE-TPTL and RV-TPTL verification to diagnose the exact point at which a decision can be made or changed.
 
 Peter Baumgartner mentioned a preliminary version of these ideas to me, after reading \textcite{chai2014fivevalued}, which deals with the uncertainty produced by verifying concurrent systems.
 
-A looping technique could be used at the end of a IE-TPTL trace, so that one could diagnose at what time after the final state might the formula change from one result to another. But this performs very badly, as I found out with some simple tests. A better solution would be to simplify the formula at the final state to only contain time constraints, and then pass this to a quantifier elimination procedure to make a decision.
+A looping technique could be used at the end of an IE-TPTL trace so that one could diagnose at what time after the final state might the formula change from one result to another. But this performs very badly, as I found out with some simple tests. A better solution would be to simplify the formula at the final state to only contain time constraints, and then pass this to a quantifier elimination procedure to make a decision.
 
 \subsubsection{Loop detection}
-Since the rewriting algorithm uses DNF clauses, it is possible for an infinite loop to occur. It would be useful to be able to detect such a loop using strongly connected component checking. This could be implemented in similar fashion to the work of \textcite{lichtenstein1985checking} concerning model checking. A graph is built using the formula as nodes and the rewrites as edges between the nodes. If there is an infinite loop then there is a strongly connected component in which the loop occurs. One may be able to detect the looping in some cases and terminate the rewriting, making some intelligent decision as to what the result would be.
+Since the rewriting algorithm uses DNF clauses, an infinite loop can occur. It would be useful to be able to detect such a loop using strongly connected component checking. This could be implemented similarly to the work of \textcite{lichtenstein1985checking} concerning model checking. A graph is built using the formula as nodes and the rewrites as edges between the nodes. If there is an infinite loop then there is a strongly connected component in which the loop occurs. One may be able to detect the looping in some cases and terminate the rewriting, making some intelligent decision as to what the result would be.
 
 \subsubsection{Memoization}
-\textcite[180]{rosu2005rewriting} developed a performance enhancement for their LTL rewriting algorithm called memoization. Using this method, the input formula-state combinations are hashed and mapped to their rewritten result. Each time the formula-state combination is seen again, the algorithm uses the cached result instead of rewriting using the algorithm. \citeauthor{rosu2005rewriting} found that this significantly improved performance in their system. This would not work as it for TPTL, since the time is an important factor in the rewriting procedure, and most real world traces would have a time which changes. Because of this, the algorithm would rarely see the same formula-time-state combination twice, rendering memoization useless.
+\textcite[180]{rosu2005rewriting} developed a performance enhancement for their LTL rewriting algorithm called memoization. Using this method, the input formula-state combinations are hashed and mapped to their rewritten result. Each time the formula-state combination is seen again, the algorithm uses the cached result instead of rewriting using the algorithm. \citeauthor{rosu2005rewriting} found that this significantly improved performance in their system. This would not work as it for TPTL, since the time is an important factor in the rewriting procedure, and most real-world traces would have a time which changes. Because of this, the algorithm would rarely see the same formula-time-state combination twice, rendering memoization useless.
 
 However, there may be some variation of this method which could improve performance, perhaps by checking untimed subformula against a cache. There may also be some smart algorithm for dealing with the timed portion of formulae, but I have not thought of one. It would be useful to investigate this method for performance improvements in TPTL rewriting algorithms.
 
@@ -809,7 +910,7 @@ These are expanded definitions which were only partially given in the main text.
 \subsection{Authorship Declarations}
 The formula rewriting functions in the \texttt{progress} object were originally written by my supervisor Peter Baumgartner as a formula progression calculator for another project. I have modified them to suit my project, but they are substantially similar. There were other functions in \texttt{progress} which I removed.
 
-The original structure of the \texttt{Formula} classes was taken from Peter's work, but substantially modified. The main remnants are some of the names of classes, some variable declarations and the \texttt{compl} method of \texttt{Formula}.
+The original structure of the \texttt{Formula} classes was taken from Peter's work but substantially modified. The main remnants are some of the names of classes, some variable declarations and the \texttt{compl} method of \texttt{Formula}.
 
 The \texttt{package} object is mostly Peter's work.
 
