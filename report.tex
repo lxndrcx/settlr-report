@@ -85,9 +85,9 @@
 \section{Introduction}
 \subsection{Runtime Verification}
 Runtime verification~\autocite{colin2005rv} is a method of monitoring a system and checking whether it satisfies (or violates) a correctness property.
-The properties of runtime verification are temporal properties, and are often specified in a temporal logic. % TODO example
+The properties of runtime verification are temporal properties and are often specified in a temporal logic. % TODO example
 
-Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, by means of a model of that system. In runtime verification we are concerned only with real world runs of a system, with the system not modeled, but monitored. In model checking each run of the system is infinite, whereas in runtime verification, runs are always a finite prefix of an infinite run, even if the system runs forever.
+Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, utilizing a model of that system. In runtime verification, we are concerned only with real-world runs of a system, with the system not modeled, but monitored. In model checking each run of the system is infinite, whereas, in runtime verification, runs are always a finite prefix of an infinite run, even if the system runs forever.
 
 TODO why is my project important
 % TODO why is my project important
@@ -102,7 +102,7 @@ TODO expand?
 Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic created for model checking. It's syntax and semantics follow. Assume that we have an infinite supply of propositional variables $a,b,c,\dots$.
 \begin{defn}[LTL Syntax]
 
-  An LTL formula $\varphi$ is inductively defined in as follows\footnote{In Bachus-Naur form}:
+  An LTL formula $\varphi$ is inductively defined as follows\footnote{In Bachus-Naur form}:
   \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \bigcirc \varphi ~|~ \varphi \U\varphi\]
 \end{defn}
 \begin{notn}[LTL Abbreviations]\label{ltlabbrev}
@@ -129,7 +129,8 @@ The formulae of LTL are interpreted over sequences of states called traces.
 
 \begin{notn}[Satisfaction Relations]
 
-  Let $\vDash_{\text{S}}$ signify semantics entailment in the system S, and call it the satisfaction relation for S. If the system is clear from the context I just write $\vDash$
+  Let $\vDash_{\text{S}}$ signify semantic entailment in the system S, % FIXME what is a system
+  and call it the satisfaction relation for S. If the system is clear from the context I just write $\vDash$
 
 \end{notn}
 
@@ -175,7 +176,7 @@ TODO reference proof
 
 \subsection{Finite LTL}
 For runtime verification, we are generally concerned with finite traces. Since LTL is defined over infinite traces, a modification of the logic is necessary to apply it to runtime verification problems. %TODO give good reasons
-There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)~\autocite{rosu2005rewriting}, RV-LTL~\autocite{bauer2010comparing} and the two logics which RV-LTL is based upon, FLTL and LTL$_3$~\autocite{bauer2010comparing}.
+There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)~\autocite{rosu2005rewriting}, RV-LTL~\autocite{bauer2010comparing} and the two logics that RV-LTL is based upon, FLTL and LTL$_3$~\autocite{bauer2010comparing}.
 Assume that each trace $\sigma$ in this section is finite.
 
 TODO expand
@@ -221,7 +222,7 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
 \begin{defn}[FLTL Syntax]
 
-  A FLTL formula $\varphi$ is inductively defined in as follows:
+  A FLTL formula $\varphi$ is inductively defined as follows:
   \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \sn \varphi ~|~ \wn \varphi ~|~ \varphi \U\varphi\]
 
   $\sn$ is pronounced `strong next'.
@@ -275,10 +276,9 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
 \begin{defn}[\ltlt\ Syntax]
 
-  A \ltlt\ formula $\varphi$ is inductively defined in as follows:
-  \[\varphi ::= a ~|~ \bot ~|~ ? ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \varphi \U\varphi\]
+  A \ltlt\ formula $\varphi$ is inductively defined as follows:
+  \[\varphi ::= a ~|~ \bot ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \varphi \U\varphi\]
 
-  $?$ is pronounced `unknown'.
 \end{defn}
 \begin{defn}[\ltlt\ semantics]\label{ltltsem}
 
@@ -291,7 +291,8 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
       ? & \text{otherwise}
     \end{cases}
     \]
-  % A full definition is given in Appendix \ref{fulldef} as \Cref{ltltsemfull}.
+    Where $?$ is a truth value called `inconclusive'. $?$ is not part of the syntax of \ltlt, rather it is part of the semantic meta-language~\autocite[659]{bauer2010comparing}.
+    % A full definition is given in Appendix \ref{fulldef} as \Cref{ltltsemfull}.
 \end{defn}
 
 It is not obvious on first reading that runtime verification using \ltlt is decidable. A runtime verification procedure for \ltlt is given in \textcite[6]{arafat2005runtime}. The procedure is doubly exponential with respect to the size of the input formula.
@@ -309,7 +310,7 @@ Let $r,y,g\in P$ and $\varphi = \Box (g \to (\neg r \U y))$ be an \ltlt formula,
 \subsubsection{RV-LTL} RV-LTL is based on FLTL and \ltlt.
 \begin{defn}[RV-LTL Syntax]
 
-  An RV-LTL formula $\varphi$ is inductively defined in as follows:
+  An RV-LTL formula $\varphi$ is inductively defined as follows:
   \[\varphi ::= a ~|~ \bot ~|~ \bot^P ~|~ \neg \varphi ~|~\varphi \lor \varphi ~|~ \varphi \land \varphi ~|~ \sn \varphi ~|~ \wn \varphi ~|~ \varphi \U\varphi\]
 
   $\bot^P$ is pronounced `presumably false'.
@@ -402,7 +403,7 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 
 \subsection{Finite TPTL}
 
-\subsubsection{IE-TPTL} As in IE-LTL, in IE-TPTL we assume that the final state of a trace repeats forever.  I'm not sure if this has been studied before. In \textcite{chai2013rewriting} a runtime verification algorithm for TPTL is introduced, which look like IE-TPTL, but it is not clear if that's what is used.\\
+\subsubsection{IE-TPTL} As in IE-LTL, in IE-TPTL we assume that the final state of a trace repeats forever. I'm not sure if this has been studied before. In \textcite{chai2013rewriting} a runtime verification algorithm for TPTL is introduced, which look like IE-TPTL, but it is not clear if that's what is used.\\
 In IE-TPTL, the only difference from TPTL is the semantics in the final state. The syntax remains the same as in TPTL.
 
 \begin{defn}[IE-TPTL semantics]\label{ietptlsem}
@@ -642,8 +643,8 @@ Using Scala classes, methods, and implicits I have constructed a convenient DSL 
 
 For example, to write the formula $\Box x. (a \to \Diamond y. (b \land (y \leq x + 2)))$ using my DSL, I can write \lstinline{G ('x ~ (a -> F ('y ~ (b /\ ('y <= 'x + 2)))))}.
 
-The language is mostly defined using methods of the abstract class \lstinline{Formula}. Listing \ref{lstbasic} shows the definitions for LTL fragment:
-\begin{lstlisting}[caption={Basic DSL Functions},label=lstbasic]
+The language is mostly defined using methods of the abstract class \lstinline{Formula}. Here are some of the basic definitions for LTL fragment:
+\begin{lstlisting}[label=lstbasic]
 abstract class Formula {
   ...
   def /\(f:Formula) = And(this,f)
@@ -733,35 +734,129 @@ case class LTEQ(t1: TimeTerm, t2: TimeTerm) extends Formula {...}
 
 \subsection{Runtime Verification}
 \subsubsection{Formula Rewriting}
-I have implemented a runtime verifier on top of the shallow embedded DSL for timed temporal logic. It uses a formula rewriting algorithm.
+I have implemented a runtime verifier on top of the shallow embedded domain specific language (DSL) for timed temporal logic. It uses a formula rewriting algorithm.
 Other works on rewriting algorithms that I have read~\autocites{rosu2005rewriting,chai2013rewriting} used the rewriting engine Maude~\autocite{clavel2002maude} to perform their rewrites. This was not my approach.
 
-Instead, I was given access to a `progression calculator' for LTL that my supervisor had written previously. Using this as a base, I implemented my DSL to work with the provided progression functions which I then adapted to my project. The progression functions (\texttt{expand} and \texttt{unX})
+Instead, I was given access to a `progression calculator' for LTL that my supervisor had written previously.
+Using this as a base, I implemented my DSL to work with the provided progression functions which I then adapted to my project.
+The progression function \texttt{expand} breaks down input formula into disjunctive normal form (DNF) clauses (a set of disjunctions between sets of conjunctions).
+It then uses my simplification methods and uses the expansion laws (\Cref{fltlexp}) to expand the formula (and subformula).
+Once a formula is either simplified to True/False or has `next' ($\sn,\wn$) in front of it, it is done. Once all formulae are done, the resulting clause set is returned.
+The other part of `progression' is the removal of `next' operators, which is done by the \texttt{unX} function.
+
+The simplification is pressed by my \texttt{apply} and \texttt{simplify} methods.
+The difference between these two methods is that \texttt{apply} does simplify based on the current state (the state is \emph{applied} to the formula), while \texttt{simplify} only uses the current time. Both methods check for some basic tautologies like $a\lor\neg a$.
+The reason for this is that I only want to simplify propositional subformulae (subformulae not part of a temporal subformula) based on the current state interpretation. When a temporal subformula is encountered, \texttt{apply} calls \texttt{simplify} on it.
+The reason \texttt{simplify} uses time is to check if there is a time constraint in the formula which will always be true or false.
+I found this simplification technique to be a significant performance improvement over plain rewriting, although I do not have measurements of this improvement.
+
+My verifier takes a timed trace and a formula and recursively passes it to the \texttt{expand} and \texttt{unX} functions, until the final state is reached. In the final state the finalise method for the chosen logic is called. I will now describe these methods separately.
 
 \subsubsection{IE-TPTL}
-TODO
-\begin{eg}[IE-TPTL verification examples]
-  TODO
-\end{eg}
-% TODO examples
+For the Infinite Extension semantics, we assume the final state is repeated forever. Because of this we can strip all temporal quantifiers i.e., $\Box \varphi, \Diamond \varphi, \psi \U \varphi, \bigcirc \varphi$ all become $\varphi$. While my implementation has `strong next' $\sn$ and `weak next' $\wn$ in it, in IE-TPTL they are both treated as if they were just the regular `next' $\bigcirc$.
 
-\begin{lstlisting}[caption={Finalise method for IE-TPTL}]
-TODO
+For the freeze operator, the time of the final state is substituted into the occurrences of it's bound variable. I separately substitute a large number (the maximum integer value) as well, and compare the result of the two substitutions. If they differ I tell the user that the result eventually changes and the later result is returned. Any remaining integer comparisons with free variables are treated as a tightly bound freeze quantifier e.g., $x + 2 < 5$ is treated like $x. (x + 2 < 5)$.
+
+The remaining operators are simplified by \texttt{apply} as normal.
+
+% \begin{lstlisting}[caption={Finalise method for IE-TPTL}]
+% def finaliseIE[A](state: (Int, A)): Const = {
+%     val t = state._1 // the time at the current state
+%     val end = Int.MaxValue // a time far away
+%     def inner(f: Formula): Formula = {
+%       f match {
+%         case op:temporalUnOp => inner(op.f) // strip temporal operators
+%         case Until(_,sf) => inner(sf) // strip temporal operators
+%         case Neg(sf) => Neg(inner(sf)) apply state
+%         case Or(f1,f2) => Or(inner(f1),inner(f2)) apply state
+%         case And(f1,f2) => And(inner(f1),inner(f2)) apply state
+%         case fz @ Freeze(_, _) => {
+%           val now = inner(fz.subst(t)) // substitute the time now
+%           val fin = inner(fz.subst(end)) // and later
+%           // then see if the result will eventually change
+%           if (now != fin) {
+%             vprintln(2,s"Subformula $f at time $t is $now, but eventually changes to $fin")
+%             fin
+%           }
+%           else now
+%         }
+%         case lt @ LTEQ(_,_) => {...} // essentially same as Freeze
+%         case _ => f apply state
+%       }
+%     }
+%     inner(this)
+%   }
+% \end{lstlisting}
+
+\begin{eg}[IE-TPTL verification example]\label{ieverifyeg}~\\
+  The following shows an example of verifying the property $\Diamond y. (y\leq x + 3 \land a)$ against the trace $((2,\epsilon),(5,(a)))$ and then $((2,\epsilon))$. I takes place in the Scala interpreter:
+\begin{lstlisting}[frame=none]
+scala> val a = Atom("a",{x:List[String]=> x.contains("a")})
+a: settlr.Atom[List[String]] = a
+
+scala> val p = 'x ~ F('y~ (('y <= 'x + 3) /\ a))
+p: settlr.Freeze = 'x. ◇ 'y. (('y <= 'x + 3) ∧ a)
+
+scala> val trace = List( (2,List()), (5,List("a")))
+trace: List[(Int, List[String])] = List((0,List()), (1,List(a)))
+
+Verifying: 'x. ◇ 'y. (('y <= 'x + 3) ∧ a)
+Trace: [(2, List()),(5, List(a))]
+Forumula Progressed:    ◇ 'y. (('y <= 5) ∧ a)
+Remaining Trace:        [(5, List(a))]
+finalise: ◇ 'y. (('y <= 5) ∧ a) @ time: 5, state: List(a)
+Subformula 'y. (('y <= 5) ∧ a) at time 5 is ⊤, but eventually changes to ⊥
+Finalise result: ⊥
+Violates trace.
+
+res0: settlr.Formula = ⊥
+
+scala> val trace2 = List( (2,List()))
+trace2: List[(Int, List[Nothing])] = List((2,List()))
+
+scala> verifyIETrace(p,trace2)
+Verifying: 'x. ◇ 'y. (('y <= 'x + 3) ∧ a)
+Trace: [(2, List())]
+finalise: 'x. ◇ 'y. (('y <= 'x + 3) ∧ a) @ time: 2, state: List()
+Finalise result: ⊥
+Violates trace.
+
+res1: settlr.Formula = ⊥
 \end{lstlisting}
-% FIXME put in listing
-\subsubsection{RV-TPTL}
-My implementation is an approximation of RV-TPTL, since the simplification methods do not detect all tautologies.
-TODO
-\begin{eg}[RV-TPTL verification examples]
-  TODO
 \end{eg}
-% TODO examples
 
-TODO mention the time abbreviations for free variables.
-% TODO time abbreviations (free vars)
+\subsubsection{RV-TPTL}
+My implementation is an approximation of RV-TPTL, since the simplification methods do not detect all tautologies. If time permitted I would use a tableau procedure in the final state as I described in \Cref{decision}.
 
-TODO talk about simplification and its impact on performance.
-% TODO complexity better with simp
+In the RV-TPTL finalise method, the formula is rewritten (but not progressed with \texttt{unX}) before finalising. This means the resulting formula is made up of conjunctions and/or disjunctions of `next' subformulae.
+
+Then all occurrences of `weak next' ($\wn$) are replaced with `presumably true' ($\top^P$) and occurrences of `strong next' ($\sn$) are replaced with `presumably false' ($\bot^P$). Now the conjunctions and disjunctions can be evaluated, where `and' is the minimum of the conjuncts and `or' is the maximum of the disjuncts, with the ordering $\top>\top^P>\bot^P>\bot$.
+
+\begin{eg}[RV-TPTL verification examples]~\\
+  The following example is a continuation of the \Cref{ieverifyeg} example showing how verification in RV-TPTL differs.
+\begin{lstlisting}[frame=none]
+scala> verifyRVTrace(p,trace)
+Verifying: 'x. ◇ 'y. (('y <= 'x + 3) ∧ a)
+Trace: [(2, List()),(5, List(a))]
+Forumula Progressed:    ◇ 'y. (('y <= 5) ∧ a)
+Remaining Trace:        [(5, List(a))]
+finalise: ◇ 'y. (('y <= 5) ∧ a) @ time: 5, state: List(a)
+Result is {{}} by simplification
+Finalise result: ⊤
+Satisfies trace.
+
+res2: settlr.Formula = ⊤
+
+scala> verifyRVTrace(p,trace2)
+Verifying: 'x. ◇ 'y. (('y <= 'x + 3) ∧ a)
+Trace: [(2, List())]
+finalise: 'x. ◇ 'y. (('y <= 'x + 3) ∧ a) @ time: 2, state: List()
+Finalise result: ⊥ᴾ
+Presumably violates trace.
+
+res3: settlr.Formula = ⊥ᴾ
+\end{lstlisting}
+\end{eg}
 
 \section{Discussion}
 \subsection{Future Work}
@@ -776,7 +871,7 @@ Peter Baumgartner mentioned a preliminary version of these ideas to me, after re
 A looping technique could be used at the end of an IE-TPTL trace so that one could diagnose at what time after the final state might the formula change from one result to another. But this performs very badly, as I found out with some simple tests. A better solution would be to simplify the formula at the final state to only contain time constraints, and then pass this to a quantifier elimination procedure to make a decision.
 
 \subsubsection{Loop detection}
-Since the rewriting algorithm uses DNF clauses, an infinite loop can occur. It would be useful to be able to detect such a loop using strongly connected component checking. This could be implemented similarly to the work of \textcite{lichtenstein1985checking} concerning model checking. A graph is built using the formula as nodes and the rewrites as edges between the nodes. If there is an infinite loop then there is a strongly connected component in which the loop occurs. One may be able to detect the looping in some cases and terminate the rewriting, making some intelligent decision as to what the result would be.
+Since the rewriting algorithm uses DNF clauses, an infinite loop can occur. It would be useful to be able to detect such a loop using strongly connected component checking. This could be implemented similarly to the work of \textcite{lichtenstein1985checking} concerning model checking. A graph is built using the formula as nodes and the rewrites as edges between the nodes. If there is an infinite loop then there is a strongly connected component in which the loop occurs. One may be able to detect the looping in some cases (not all cases) and terminate the rewriting, making some intelligent decision as to what the result would be.
 
 \subsubsection{Memoization}
 \textcite[180]{rosu2005rewriting} developed a performance enhancement for their LTL rewriting algorithm called memoization. Using this method, the input formula-state combinations are hashed and mapped to their rewritten result. Each time the formula-state combination is seen again, the algorithm uses the cached result instead of rewriting using the algorithm. \citeauthor{rosu2005rewriting} found that this significantly improved performance in their system. This would not work as it for TPTL, since the time is an important factor in the rewriting procedure, and most real-world traces would have a time which changes. Because of this, the algorithm would rarely see the same formula-time-state combination twice, rendering memoization useless.
