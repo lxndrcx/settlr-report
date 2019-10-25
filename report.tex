@@ -94,13 +94,13 @@ The properties of runtime verification are temporal properties specified in some
 
 Runtime verification can be used in conjunction with other verification techniques, but it is also useful in and of itself. Some systems may be too complex to model, or may be otherwise difficult to test adequately. The inspiration for this runtime verification project was situational awareness systems, specifically the Fusemate system at Data61~\autocite{Baumgartner:Haslum:situational-awareness-industrial-operations:ASOR:2018}. The goal was to be able to verify properties of a supply chain system, for example, `Does the shipment of apples arrive at it's destination within 5 hours of being shipped?'
 
-Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, utilizing a model of that system. In runtime verification, we are concerned only with real-world runs of a system, with the system not modeled, but monitored. In order to monitor the system some instrumentation may occur, so that the monitor can easily detect states of the system. In model checking each run of the system is infinite, whereas, in runtime verification, runs are always a finite prefix of an infinite run, even if the system were to run forever.
+Runtime verification is closely related to model checking~\autocite{baier2008principles}. Model checking is concerned with verifying all possible runs of a system, utilizing a model of that system. In runtime verification, we are concerned only with real-world runs of a system, with the system not modeled, but monitored. In order to monitor the system some instrumentation may occur, so that the monitor can easily detect states of the system. In model checking each run of the system is infinite, whereas, in runtime verification, the runs to be verified are always a finite prefix of an infinite run.
 
 In this project, the specification languages I have used are temporal logics, which I will now attempt to explain. I assume the reader is reasonably comfortable with logic, for an introduction to logic please see \textcite{bradley2007calculus}.
 
 \section{Temporal Logic}
 
-A temporal logic is a modal logic which can be used to reason about time. Some temporal logics are only capable of modelling order e.g., `this will happen in the future', and some are capable of order and explicit time e.g., `twenty minutes in the future this will happen'. All of the logics I will discuss are based on Linear Temporal Logic, which models temporal order. I had the need for explicit time, so I then discuss Timed Propositional Temporal logic, which extends Linear Temporal Logic with explicit time. Both of these logics are defined on infinite traces. Because of the need to reason about finite traces in runtime verification, alternate variants of the model checking logics are necessary. I discuss some of these finite-trace variants that I think are the most interesting and then I construct a new logic based on those discussed.
+A temporal logic is a modal logic which can be used to reason about time. Some temporal logics are only capable of modelling order e.g., `this will happen in the future', and some are capable of order and explicit time e.g., `twenty minutes in the future this will happen'. All of the logics I will discuss are based on Linear Temporal Logic, which models temporal order. I had the need for explicit time, so I then discuss Timed Propositional Temporal logic, which extends Linear Temporal Logic with explicit time. Both of these logics are defined on infinite traces. Because of the need to reason about finite (prefixes of) traces in runtime verification, alternate variants of the model checking logics are necessary. I discuss some of these finite-trace variants that I think are the most interesting and then I construct a new logic based on those discussed.
 
 \subsection{Linear Temporal Logic}
 Linear Temporal Logic (LTL)\autocite{pnueli1977temporal} is a temporal logic created for model checking. LTL models the order of events but not the explicit time of events. For an in depth introduction to LTL see \textcite[Chapter 5]{baier2008principles}. The syntax and semantics of LTL follow. I use Bachus-Naur form to define the syntax grammar throughout this report. Assume that we have an infinite supply of propositional variables $a,b,c,\dots$
@@ -184,7 +184,7 @@ A proof of \Cref{ltlexp} is available in \textcite[249]{baier2008principles}.
 
 
 \subsection{Finite LTL}
-For runtime verification, we are generally concerned with finite traces. Since LTL is defined over infinite traces, a modification of the logic is necessary to apply it to runtime verification problems.
+For runtime verification, we need to reason about finite traces. Since LTL is defined over infinite traces, a modification of the logic is necessary to apply it to runtime verification problems.
 There are several variations of finite LTL semantics, I will consider Infinite Extension LTL (IE-LTL)~\autocite{rosu2005rewriting}, RV-LTL~\autocite{bauer2010comparing} and the two logics that RV-LTL is based upon, FLTL and LTL$_3$~\autocite{bauer2010comparing}.
 Assume that each trace $\sigma$ in this section is finite.
 
@@ -252,9 +252,9 @@ Thus, in the final state, the weak operator evaluates to true, and the strong ne
 
   In FLTL, the following expansion laws are equivalences:
   \begin{align}
-    \Box \varphi \equiv \varphi \land \wn \Box \varphi \label{felBox}\\
-    \Diamond \varphi \equiv \varphi \lor \sn \Diamond \varphi\label{felDiamond}\\
-    \psi \U \varphi \equiv \varphi \lor (\psi \land \sn (\psi \U \varphi))\label{felU}
+    \Box \varphi &\equiv \varphi \land \wn \Box \varphi \label{felBox}\\
+    \Diamond \varphi &\equiv \varphi \lor \sn \Diamond \varphi\label{felDiamond}\\
+    \psi \U \varphi &\equiv \varphi \lor (\psi \land \sn (\psi \U \varphi))\label{felU}
   \end{align}
 
 \end{lem}
@@ -342,9 +342,6 @@ Integer comparison is added to the logic, to allow for specifications such as: `
 
 TPTL is a generalisation of LTL, all properties expressed in LTL are expressible in TPTL as well.
 
-% TODO say how TPTL generalises LTL, thanks Peter
-
-
 \begin{defn}[Timed Trace]
 
   A Timed Trace $\rho = (\sigma,\tau)$ is a pair of a trace (state sequence) $\sigma \in P^+$ and a time sequence $\tau \in \mathbb{N}^+$ which is a sequence of non-negative integers that is monotonically non-decreasing ($\forall i. ~\tau_i \leq \tau_{i+1}$) and eventually always increasing ($\forall i. \exists j. ~\tau_i < \tau_j$).
@@ -391,7 +388,7 @@ We read $x. \varphi$ as `freeze $x$ in $\varphi$'.
 
 \subsection{Finite TPTL}
 
-\subsubsection{IE-TPTL} As in IE-LTL, in IE-TPTL we assume that the final state of a trace repeats forever. I'm not sure if this has been studied before. In \textcite{chai2013rewriting} a runtime verification algorithm for TPTL is introduced, which look like IE-TPTL, but it is not clear if that's what is used.\\
+\subsubsection{IE-TPTL} As in IE-LTL, in IE-TPTL we assume that the final state of a trace repeats forever. I'm not sure if this has been studied before. In \textcite{chai2013rewriting} a runtime verification algorithm for TPTL is introduced, which looks like IE-TPTL, but it is not clear if that's what is used.\\
 In IE-TPTL, the only difference from TPTL is the semantics in the final state. The syntax remains the same as in TPTL.
 
 \begin{defn}[IE-TPTL semantics]\label{ietptlsem}
@@ -428,7 +425,7 @@ A solution to this problem could be to simplify the formula in the last state to
   The timed trace $((0,\{g\}),(10,\{y\}),(15,\{r\}))$ satisfies $\varphi$, as does $((100,\{\}))$ (vacuously).
 \end{eg}
 
-\subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, are a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The broad idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
+\subsubsection{RV-TPTL} The following finite semantics for TPTL, which I name RV-TPTL, is a combination of the RV-LTL four valued logic and TPTL. I have not seen this combination elsewhere in the literature, and thus assume it is new. The closest I have seen is the three valued TLTL$_3$~\autocite[6]{arafat2005runtime} which is based on \ltlt\ and TLTL, a different timed temporal logic. The broad idea is that if RV-LTL is finite LTL + uncertainty and TPTL is LTL + explicit time, then RV-TPTL is finite LTL + uncertainty + explicit time.
 
 \begin{defn}[RV-TPTL Syntax]
 
@@ -484,44 +481,6 @@ A solution to this problem could be to simplify the formula in the last state to
   The timed trace $((1,\{g\}),(2,\{g\}))$ presumably violates the trace.
 \end{eg}
 
-In my implementation of RV-TPTL, I have modified and approximated the semantics. See \Cref{implementaion} for details.
-
-% \begin{defn}{Generalised RV-TPTL Semantics}
-
-%   Let $f:D\to\{\bot,\top\}$ be a function with a domain $D$. Let $\sigma\in D^+$ be a state sequence of $D$ (rather than $P$, as in previous definition). Then take the semantics of TPTL (\Cref{tptlsem}), and replace the rule for propositional variables (inherited from LTL) with:
-%   \[ \rho \vDash f \tiff f(\sigma_0)\\ \]
-
-%   Then replace the next rule with the following two rules:
-%   \begin{align*}
-%     \rho&\vDash\sn\varphi =
-%     \begin{cases}
-%       \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
-%       \top &\text{if } \varphi \text{ is a tautology}\\
-%       \bot^P &\text{if } \rho^1 = \epsilon \tand \varphi \text{ is not a tautology}\\
-%       \bot &\text{otherwise}
-%     \end{cases}\\
-%     \rho&\vDash\wn\varphi =
-%     \begin{cases}
-%       % \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tor \rho^1 = \epsilon\\
-%       \top &\text{if } \rho^1\vDash_{TPTL}\varphi \tand \rho^1 \neq \epsilon\\
-%       \top &\text{if } \varphi \text{ is a tautology}\\
-%       \top^P &\text{if } \rho^1 = \epsilon \tand \varphi \text{ is not a tautology}\\
-%       \bot &\text{otherwise}
-%     \end{cases}
-%   \end{align*}
-
-%   Then modify the semantics of $\lor$ to be the least upper bound~\autocite[654]{bauer2010comparing} of the disjuncts, where the truth values have the ordering \(\top\geq\top^P\geq\bot^P\geq\bot\). The least upper bound is essentially the maximum of the disjuncts. Let $\sqcap$ be the least upper bound operator, then:
-%   \[\rho\vDash\varphi\lor\psi := (\rho\vDash\varphi) \sqcap (\rho\vDash\psi)\]
-
-% \end{defn}
-
-% The generalised RV-TPTL semantics are equivalent to the standard RV-TPTL semantics, but easier to implement with rewrites. % TODO proof?
-
-% \begin{remk}
-%   Let $D = P$, and let there be functions $f_a,f_b,\dots$ for every variable $a,b,\dots\in P$ such that $f_a(\sigma_i) \tiff a\in \sigma_i$. Then the generalised RV-TPTL can simulate the atoms of the standard RV-TPTL, by replacing each atom $a$ in a formula with $f_a$.
-
-% \end{remk}
-
 \section{Runtime Verification using Formula Rewriting}
 \subsection{Formula Rewriting}
 Formula rewriting~\autocite{rosu2005rewriting}, or formula progression, is a technique used in runtime verification.
@@ -547,7 +506,6 @@ The rewrite in~\eqref{rw1} uses the expansion law $\Box \varphi \equiv \varphi \
 Then in~\eqref{rw2} the formula is rewritten to false, since the right conjunct is false given $r$ being true. This is the case whether or not $\{r\}$ is the final state in the trace. If the trace were longer no more of it would need to be validated, all possible suffixes of $\sigma$ violate the formula $\varphi$.
 \end{eg}
 
-Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ for the remainder of the section.
 
 
 \subsubsection{Decision procedure for RV-TPTL}
@@ -573,10 +531,11 @@ In order to decide if a trace satisfies or violates a formula in RV-TPTL, the fo
 My implementation is only an incomplete version of the above decision procedure, I do not check satisfiability of $\phi$ or $\neg\phi$, so cannot tell if the formula is true or false for all suffixes. See \Cref{rvimp} for more information.
 
 \begin{eg}[Apples]
+  Let $\rw{E}$ stand for $\rw{\text{RV-TPTL},E}$ in this example.
 
   For a timed example in RV-TPTL, consider a container of apples which needs to be delivered to a store within a specified time.
   Let $V=\{sent, received\}$,
-  \(\rho=((\{sent\},\{received\}),(1,4))\),
+  \(\rho=((\{sent\},\{received\}),(1,4))\)
   and \(\varphi=\Box x. (sent \to \Diamond y. (received \land y \leq x + 3))\).
   The trace $\rho$ will presumably satisfy the formula.
   Here is the progression:
@@ -605,10 +564,6 @@ My implementation is only an incomplete version of the above decision procedure,
   Note that this formula is only ever satisfied or violated by infinite traces, which is why the uncertainty given by RV-TPTL is plausibly desirable given a finite trace.
 \end{eg}
 
-% \begin{remk}{Complexity of Formula Rewriting}
-%   % TODO
-% \end{remk}
-
 \subsection{Related Work}
 Formula rewriting was devised for LTL in \textcite{rosu2005rewriting}, as part of the Java PathExplorer project, and has been used in some NASA programs. The technique was revised for TPTL in \textcite{chai2013rewriting}, with a case study of its potential for use in a train control system. In both of these works, a separate rewrite engine called Maude~\autocite{clavel2002maude} was used. In the next section, I discuss the implementation of my rewrite based verification tool, which does not use Maude.
 
@@ -617,8 +572,7 @@ I have implemented a runtime verifier in the Scala programming language.
 It is embedded into Scala as an internal Domain Specific Language (DSL), this is also known as a shallow embedding.
 I allow the user to choose a logic, either RV-TPTL or IE-TPTL.
 My verifier is structured as a library that can be integrated into other Scala programs.
-I will describe the interesting aspects of my implementation, but it is also available in the repository \url{TODO} % TODO link repo
-in case you wish the see the full source or run it. I have tried to present the implementation without getting bogged down in details, so I have simplified the code listings to be more readable where possible.
+I will describe the interesting aspects of my implementation. I have tried to present the implementation without getting bogged down in details, so I have simplified the code listings to be more readable where possible.
 
 \subsection{Shallow Embedding}
 When implementing a Domain Specific Language, it is possible to write an internal or external DSL, also known as shallow or deep embedded DSLs respectively. In a deep embedding, the implementer is required to create a parser that translates the DSL into another another form for evaluation. In a shallow embedding, the DSL takes form within the parent language, delegating the parsing to the parser of the language, which has already been written and tested. The terms of the DSL become types within the parent language and then the implementer can use the libraries and infrastructure provided for that language~
@@ -660,12 +614,12 @@ Importantly, I implemented atoms as functions rather than propositional variable
 case class Atom[A](name: String, interpretation: A => Boolean) extends Formula
 ...
   def apply[A](state: (Int,A)): Formula = this match {
-      if (fun(state._2)) True
+      if (interpretation(state._2)) True
       else False
   }
 \end{lstlisting}
 
-The \texttt{apply} function takes a timed state and simplifies based on that interpretation. An \texttt{Atom} has an \texttt{interpretation} function (passed to the constructor) which takes any type as input (e.g., a String, a List, etc) and outputs a boolean, and the apply function maps that boolean to \texttt{True} or \texttt{False}, which are \texttt{Const} objects in my logic, not the Scala booleans \texttt{true} and \texttt{false}.
+The \texttt{apply} function takes a timed state and simplifies based on that interpretation. An \texttt{Atom} has an \texttt{interpretation} function (passed to the constructor) which takes any type as input (e.g., a String, a List, etc) and outputs a boolean, and the \texttt{apply} function maps that boolean to \texttt{True} or \texttt{False}, which are \texttt{Const} objects in my logic, not the Scala booleans \texttt{true} and \texttt{false}.
 \begin{lstlisting}
 abstract class Const(name: String, n: Int) extends Formula with Ordered[Const] {...}
 case object False extends Const("⊥",0)
@@ -793,8 +747,8 @@ trace: List[(Int, List[String])] = List((0,List()), (1,List(a)))
 scala> verifyIETrace(p,trace)
 Verifying: 'x. ◇ 'y. (('y <= 'x + 3) ∧ a)
 Trace: [(2, List()),(5, List(a))]
-Forumula Progressed:    ◇ 'y. (('y <= 5) ∧ a)
-Remaining Trace:        [(5, List(a))]
+Forumula Progressed: ◇ 'y. (('y <= 5) ∧ a)
+Remaining Trace: [(5, List(a))]
 finalise: ◇ 'y. (('y <= 5) ∧ a) @ time: 5, state: List(a)
 Finalise result: ⊤
 Satisfies trace.
@@ -828,8 +782,8 @@ Then all occurrences of `weak next' ($\wn$) are replaced with `presumably true' 
 scala> verifyRVTrace(p,trace)
 Verifying: 'x. ◇ 'y. (('y <= 'x + 3) ∧ a)
 Trace: [(2, List()),(5, List(a))]
-Forumula Progressed:    ◇ 'y. (('y <= 5) ∧ a)
-Remaining Trace:        [(5, List(a))]
+Forumula Progressed: ◇ 'y. (('y <= 5) ∧ a)
+Remaining Trace: [(5, List(a))]
 finalise: ◇ 'y. (('y <= 5) ∧ a) @ time: 5, state: List(a)
 Result is {{}} by simplification
 Finalise result: ⊤
@@ -851,11 +805,11 @@ res3: settlr.Formula = ⊥ᴾ
 \subsection{Discussion of Implementation}
 My implemented runtime verification library demonstrates that formula rewriting is a viable technique for runtime verification in Scala, just as it is using other rewriting systems such as Maude. While no measurements have been taken, the implementation appears to run quickly for moderate sized traces, so long as the formula being checked is not long and complex. Rewriting has the downside of a worst-case exponential complexity in the formula length. \textcite[178]{rosu2005rewriting} claim that this exponential complexity is only of theoretical importance rather than practical, as most tested formula grow linearly.
 
-A formal complexity analysis of TPTL based rewriting is desirable however, as I have not seen one. Before I implemented a simplification method that detected impossible time constraints, some timed formula (specifically of the form $\Box x. \varphi$) grow very quickly and were impractical to verify. After this simplification technique they became practical and only grew linearly. Some other future work opportunities follow.
+A formal complexity analysis of TPTL based rewriting is desirable however, as I have not seen one. Before I implemented a simplification method that detected impossible time constraints, some timed formula (specifically of the form $\Box x. \varphi$) grow very quickly and were impractical to verify. After this simplification technique they became practical and only grew linearly.
 
 % \section{Discussion}
 \section{Future Work}
-Since my implementation of the RV-TPTL runtime verification procedure is incomplete, that would be my first step in any future work. The procedure outlined in \Cref{decision} is not overly difficult, but I did not have the time to implement it. I will now describe some other interesting improvements.
+Since my implementation of the RV-TPTL runtime verification procedure is incomplete, my first step in any future work would be to correctly and completely implement \Cref{decision}. I will now describe some other interesting improvements.
 
 \subsubsection{Finding Changes in Results}
 It would be useful to be able to find the point at which a timed formula (or subformula) changes from one result to another. For example, suppose there is a timed formula and a trace $\rho$, with a time constraint that is not violated at $\rho_i$, but is violated at $\rho_{i+1}$. Also, let there be a time gap of at least 1, i.e., $\tau_i < \tau_{i+1} - 1$. Then it would be useful to diagnose where in that gap the time constraint is violated. One way to do this would be for the user to select some intermediate times to test, by giving a time $\tau_j$ with $\tau_i < \tau_j < \tau_{i+1}$. The verifier could test different states $\sigma_j$ and see where the violation occurs. Possible sensible imputations could be $\sigma_j := \sigma_i$ or $\sigma_j := \sigma_{i+1}$.
@@ -867,7 +821,7 @@ Peter Baumgartner mentioned a preliminary version of these ideas to me, after re
 A looping technique could be used at the end of an IE-TPTL trace so that one could diagnose at what time after the final state might the formula change from one result to another. But this performs very badly, as I found out with some simple tests. A better solution would be to simplify the formula at the final state to only contain time constraints, and then pass this to a quantifier elimination procedure to make a decision.
 
 \subsubsection{Memoization}
-\textcite[180]{rosu2005rewriting} developed a performance enhancement for their LTL rewriting algorithm called memoization. Using this method, the input formula-state combinations are hashed and mapped to their rewritten result. Each time the formula-state combination is seen again, the algorithm uses the cached result instead of rewriting using the algorithm. \citeauthor{rosu2005rewriting} found that this significantly improved performance in their system. This would not work as it for TPTL, since the time is an important factor in the rewriting procedure, and most real-world traces would have a time which changes. Because of this, the algorithm would rarely see the same formula-time-state combination twice, rendering memoization useless.
+\textcite[180]{rosu2005rewriting} developed a performance enhancement for their LTL rewriting algorithm called memoization. Using this method, the input formula-state combinations are hashed and mapped to their rewritten result. Each time the formula-state combination is seen again, the algorithm uses the cached result instead of rewriting using the algorithm. \citeauthor{rosu2005rewriting} found that this significantly improved performance in their system. This would not work as it is for TPTL, since the time is an important factor in the rewriting procedure, and most real-world traces would have a time which changes. Because of this, the algorithm would rarely see the same formula-time-state combination twice, rendering memoization useless.
 
 However, there may be some variation of this method which could improve performance, perhaps by checking untimed subformula against a cache. There may also be some smart algorithm for dealing with the timed portion of formulae, but I have not thought of one. It would be useful to investigate this method for performance improvements in TPTL rewriting algorithms.
 
